@@ -1,4 +1,5 @@
 import { routeSummary } from '../routing/directions'
+import { formatTime } from '../routing/format'
 import { HOTEL, LIFT_EDGE } from '../routing/hotel'
 import { PROFILE_LABELS, PROFILES, type ScenarioPlan } from '../routing/plan'
 import type { ScenarioAction } from '../routing/scenario'
@@ -9,11 +10,7 @@ const PROFILE_HINTS: Record<Profile, string> = {
   'step-free': 'Equipment cart, wheelchair, pram',
 }
 
-export function formatTime(seconds: number): string {
-  const m = Math.floor(seconds / 60)
-  const s = Math.round(seconds % 60)
-  return m > 0 ? `${m} min ${s.toString().padStart(2, '0')} s` : `${s} s`
-}
+export { formatTime }
 
 export function RouteComparison({ plan, dispatch }: { plan: ScenarioPlan; dispatch: (a: ScenarioAction) => void }) {
   const target = HOTEL.nodes[plan.target]

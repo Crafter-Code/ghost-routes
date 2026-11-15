@@ -202,17 +202,16 @@ export function FloorPlan({ plan, floor }: { plan: ScenarioPlan; floor: FloorId 
             )
           })}
 
-          {closedEdges.flatMap((edge) =>
-            [edge.from, edge.to]
-              .map(nodeAt)
-              .filter((n) => n.floor === floor)
-              .map((n) => (
-                <g key={`${edge.id}-${n.id}`} data-testid={`lock-${n.id}`}>
-                  <LockIcon x={n.x} y={n.y} />
-                  <text x={n.x} y={n.y + 34} textAnchor="middle" className="lock__label">Out of service</text>
-                </g>
-              )),
-          )}
+          {/* One lock per node: the lift's two segments share the Floor 2 door. */}
+          {[...new Set(closedEdges.flatMap((edge) => [edge.from, edge.to]))]
+            .map(nodeAt)
+            .filter((n) => n.floor === floor)
+            .map((n) => (
+              <g key={n.id} data-testid={`lock-${n.id}`}>
+                <LockIcon x={n.x} y={n.y} />
+                <text x={n.x} y={n.y + 34} textAnchor="middle" className="lock__label">Out of service</text>
+              </g>
+            ))}
 
           {plan.ghost && nodeAt(plan.ghost.endsAt).floor === floor && (
             <g data-testid="ghost-end">

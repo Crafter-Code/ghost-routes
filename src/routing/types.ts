@@ -1,4 +1,4 @@
-export type FloorId = 1 | 2
+export type FloorId = 1 | 2 | 3
 
 export type EdgeKind = 'walk' | 'ramp' | 'steps' | 'stairs' | 'lift'
 
@@ -33,6 +33,10 @@ export interface GraphEdge {
   name?: string
   /** Shown when this edge is closed, e.g. "The lift is out of service." */
   closedMessage?: string
+  /** Short label for the failure marker on the map, e.g. "Door closed". */
+  closedLabel?: string
+  /** Named stretch listed once in route summaries, e.g. "Gallery Walk". */
+  via?: string
 }
 
 export interface Graph {

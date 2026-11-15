@@ -1,6 +1,6 @@
 import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
-import { checkCandidates, findRoute, firstReachable, ghostTrail, isTraversable, STEP_KINDS } from './route'
+import { checkCandidates, divergeIndex, drawnGhostLegs, findRoute, firstReachable, ghostTrail, isTraversable, STEP_KINDS } from './route'
 import type { EdgeKind, Graph, GraphEdge, GraphNode, Profile } from './types'
 
 /**
@@ -113,6 +113,54 @@ describe('routing properties', () => {
         if (firstFound === -1) expect(proposal).toBeNull()
         else expect(proposal!.room).toBe(candidates[firstFound])
         if (proposal) expect(proposal.route.found).toBe(true)
+      }),
+    )
+  })
+})
+
+/**
+ * Properties for the Haunted Hotel Expansion (.kiro/specs/haunted-hotel-expansion/).
+ * P8 to P10 of the spec depend on hotel data (entrance gates, presets, directions) and are checked
+ * over every preset in src/routing/expansion.test.ts instead.
+ */
+describe('expansion properties', () => {
+  it('P6 (Req 3.6, 7.8): closing a whole group of edges keeps them out of every route and never reopens a target', () => {
+    fc.assert(
+      fc.property(caseArb, profileArb, fc.array(fc.nat(), { maxLength: 4 }), ({ graph, start, target, closed }, profile, picks) => {
+        if (graph.edges.length === 0) return
+        const group = picks.map((n) => graph.edges[n % graph.edges.length].id)
+        const before = findRoute(graph, start, target, profile, closed)
+        const after = findRoute(graph, start, target, profile, new Set([...closed, ...group]))
+        for (const leg of after.legs) expect(group).not.toContain(leg.edge.id)
+        if (!before.found) expect(after.found).toBe(false)
+        if (after.found) expect(after.cost).toBeGreaterThanOrEqual(before.cost)
+      }),
+    )
+  })
+
+  it('P7 (Req 13.1, 13.2, 13.3): the drawn ghost trail starts where the routes part and ends at the first closed edge', () => {
+    fc.assert(
+      fc.property(caseArb, profileArb, ({ graph, start, target, closed }, profile) => {
+        const baseline = findRoute(graph, start, target, profile)
+        const route = findRoute(graph, start, target, profile, closed)
+        const ghost = ghostTrail(baseline, closed)
+        if (!ghost) return
+        const drawn = drawnGhostLegs(ghost, route, baseline)
+        const d = route.found ? (divergeIndex(route, baseline) ?? 0) : 0
+        // The drawn trail is the end of the ghost trail, so it still ends before the closed edge.
+        expect(drawn).toEqual(ghost.legs.slice(d))
+        expect(drawn.some((leg) => closed.has(leg.edge.id))).toBe(false)
+        if (!route.found) {
+          expect(drawn).toEqual(ghost.legs)
+          return
+        }
+        // The routes share exactly the first d legs, and they part no later than the closed edge.
+        expect(d).toBeLessThanOrEqual(ghost.legs.length)
+        expect(route.legs.slice(0, d).map((l) => l.edge.id)).toEqual(baseline.legs.slice(0, d).map((l) => l.edge.id))
+        // The trail starts at the node where they part, or is empty when they part at the closed edge.
+        if (drawn.length > 0) expect(drawn[0].from).toBe(route.nodes[d])
+        else expect(ghost.endsAt).toBe(route.nodes[d])
+        if (drawn.length > 0) expect(drawn[drawn.length - 1].to).toBe(ghost.endsAt)
       }),
     )
   })

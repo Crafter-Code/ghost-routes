@@ -86,6 +86,29 @@ export function ghostTrail(baseline: RouteResult, closed: ReadonlySet<string>): 
   return { legs: baseline.legs.slice(0, index), endsAt: blocked.from, blockedBy: blocked.edge }
 }
 
+/**
+ * Index of the first leg where `route` leaves `baseline`, or null when the two do not part
+ * (identical, or either one has no route). Legs before this index are shared.
+ */
+export function divergeIndex(route: RouteResult, baseline: RouteResult): number | null {
+  if (!route.found || !baseline.found) return null
+  const length = Math.max(route.legs.length, baseline.legs.length)
+  for (let i = 0; i < length; i++) {
+    if (route.legs[i]?.edge.id !== baseline.legs[i]?.edge.id) return i
+  }
+  return null
+}
+
+/**
+ * The part of a ghost trail that is drawn dashed. With an active route, the legs it shares with the
+ * baseline are the solid route, so the drawn trail starts where the routes part (and is empty when they
+ * part at the closed transition itself). Without an active route the whole ghost trail is drawn.
+ */
+export function drawnGhostLegs(ghost: GhostTrail, route: RouteResult, baseline: RouteResult): Leg[] {
+  const from = route.found ? (divergeIndex(route, baseline) ?? 0) : 0
+  return ghost.legs.slice(from)
+}
+
 export interface CandidateCheck {
   room: string
   route: RouteResult
