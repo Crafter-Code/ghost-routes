@@ -15,7 +15,7 @@ This log records each Kiro tool used on Ghost Routes: the concrete task, what ch
 | Agent hook: Post Task Execution → build | **Pending** | Not configured yet |
 | Custom agents `route-reviewer`, `browser-qa` | **Pending** | Not created yet |
 | Playwright MCP in `.kiro/settings/mcp.json` | Used: 8/8 checks passed in Kiro CLI 3.3.0 on the local production build (fourth attempt; the first three crashed) | [`docs/evidence/mcp/`](evidence/mcp/), Browser checks below. The Playwright *test runner* is used separately |
-| Kiro CLI edge-case routing checks | **Pending** | CLI so far used only to verify the hook |
+| Kiro CLI: Haunted Hotel Expansion | Used, on `feature/haunted-hotel-expansion` (not released) | Spec, code, tests and checks: see the section at the end |
 | Kiro Web repository review | **Pending** | Needs a public repository |
 | Kiro Powers (BrowserStack) | **Pending** | Needs BrowserStack access and a public URL |
 
@@ -122,3 +122,34 @@ Two different kinds of browser check exist. They are recorded separately.
   - The preview server was stopped after the run.
 
 - **Brief 6f result (2026-11-15): Playwright MCP verified in Kiro CLI 3.3.0.** All 8 checks of [`docs/mcp-qa-prompt.md`](mcp-qa-prompt.md) passed on the local production build (`npm run build`, then `vite preview` on `127.0.0.1:4173`) with the current Chrome configuration (`--browser chrome --headless --isolated`, no `--no-sandbox`). The dashed ghost trail ending at the lift door is confirmed visually on [`mcp-2-lift-out.png`](evidence/mcp/mcp-2-lift-out.png). The MCP run confirmed only the text "Copied: entrance, floor and steps."; the clipboard content is checked by the separate Playwright test (`e2e/scenario.spec.ts`, `npm run test:e2e`). The earlier `--no-sandbox` suggestion and the "Open step" above are no longer needed for this configuration.
+
+## Haunted Hotel Expansion (branch `feature/haunted-hotel-expansion`, not on `main`)
+
+All work below ran in **Kiro CLI**, on the local production build (`npm run build`, then `vite preview` on `127.0.0.1`). The public demo at https://ghost-routes.pages.dev/ still serves the first release.
+
+### 2026-11-15 · Spec and stage 1: three-floor graph and scenarios
+
+- **Spec:** [`.kiro/specs/haunted-hotel-expansion/`](../.kiro/specs/haunted-hotel-expansion/), requirements-first, 13 requirements. Requirement 13 draws the ghost trail beside a detour: shared legs once as the solid route, the dashes from the point where the routes part, and a "Door closed" style marker when they part at the closed door.
+- **Code:** three floors, the Portrait Gallery with two doors, the Gallery Walk and west passage, a garden vestibule with its own door into Room 104, Floor 3 with the Library and the Moonlight Hall; scenario presets; the lift closes as two segments.
+- **Evidence:** `src/routing/expansion.test.ts` (H-tests named after the requirements, plus every preset × closure combination × profile), fast-check properties P6 and P7. `src/routing/hotel.test.ts` of the first release was not edited (same git blob `3593b25f`) and still passes 16 of 16.
+
+### 2026-11-15 · Stage 2: map, floor switcher, scenario interface
+
+- Floor plans in `src/map/layout.ts`, node coordinates aligned with them. `src/map/layout.test.ts` checks that every walking line crosses walls only through the door gap of its own edge.
+- Floor switcher (tab list with mini plans), steps as buttons that open their floor (`aria-current="step"`), three-column desktop layout.
+
+### 2026-11-15 · Stage 3: phone layout, motion, local checks
+
+- **Phone (under 760 px):** a compact block (scenario, closures, short status), then the floor switcher and the map, then the move options, the route comparison and the steps. The DOM order is the visual order. On a 390 × 844 screen the floor tabs start at y = 504 px, so the map begins on the first screen; after "Lift out of service" the Floor 1 map with the lift lock is still on the first screen.
+- **Motion:** the old route turns into the lilac dashed trail (0.5 s); a detour draws in from the divergence point (0.9 s after 0.45 s) with an amber halo; the moved-to room's door gets two warm pulses (3.2 s) and keeps a ring. Each animation is keyed to its own part of the plan; switching floors or selecting a step shows the final state. With reduced motion every state appears at once.
+- **Unit tests:** `npm test` 129 passed (`hotel.test.ts` 16, `expansion.test.ts` 97, `route.property.test.ts` 7, `layout.test.ts` 9).
+- **Playwright test runner (Google Chrome):** `npm run test:e2e` 19 passed, 15 skipped by project (desktop-only and phone-only tests, and the recording, which runs only with `EVIDENCE_DIR`). Covered: the original 204 → lift out → 104 demo on desktop and phone; the detour to Room 206 with "Door closed"; the move to Room 302 and a text step that opens Floor 3; the Garden Entrance; both "no suitable route" states; the keyboard; animations that run once and do not replay on floor or step changes; reduced motion (`emulateMedia({ reducedMotion: 'reduce' })`: no running animation, dashes `10px, 8px`, the detour fully drawn, the door ring 4 px); at 390 px the block order, the focus order (skip link, scenario, lift, reset, link to the move options, Floor 1 tab, … Move event, profile) and no sideways scroll in every state.
+- **Recording:** [`docs/evidence/expansion/recording-206-detour-and-204-to-104.webm`](evidence/expansion/recording-206-detour-and-204-to-104.webm), about 11 s at 1366 × 900, made by `e2e/record.spec.ts` (Playwright video; `npx playwright install ffmpeg` was run once for it).
+- **Screenshots:** `docs/evidence/expansion/`: `phone-390-0-load.png`, `phone-390-1-lift-out.png`, full-page `phone-390-1-lift-out-full.png` and `phone-390-2-moved-104-full.png`, and the four desktop floors.
+
+### 2026-11-15 · Playwright MCP in Kiro CLI, expansion
+
+- **Config:** the existing `.kiro/settings/mcp.json` (`--browser chrome --headless --isolated`), 1366 × 900, local production build.
+- **Detour to Room 206:** after "Close central door" the status read "The central door to the Portrait Gallery is closed. Your route to Room 206 is still open via Side Entrance (ramp) → Lift → Gallery Walk. It adds 1 min 11 s." in the same frame as the click. Running animations then: `halo-in`, `route-draw`, `route-draw`; the drawn path was `M320,200L120,200L35,200L35,360L320,360L320,280` (from the central corridor, round by the west passage and the Gallery Walk, into the gallery from the south). Marker: "Door closed"; no dashed trail on Floor 2. 1.8 s later no animation ran; switching to Floor 1 and back to Floor 2 started none. Screenshot [`mcp-5-detour-206.png`](evidence/mcp/mcp-5-detour-206.png).
+- **Move 204 → 104:** after "Lift out of service" the status read "No step-free route to Room 204. The lift is out of service." in the same frame; running: `ghost-casing-fade`, `ghost-fade`; after 0.8 s the trail was dashed `10px, 8px` in `rgb(132, 117, 182)`; marker "Lift out of service"; proposal "✕ Room 203 (Blue Room): no step-free route", "✓ Room 104 (Garden Hall): step-free route, 1 min 00 s". After "Move event to Room 104": focus on the heading "Directions to Room 104", status "Event moved to Room 104. Step-free route ready via Side Entrance (ramp).", the lit door at Room 104's door (560, 220). The door pulse had already ended when the next MCP call read the page, so MCP saw only the final ring (4 px); the pulse itself is checked by the Playwright test runner. Screenshots [`mcp-6-lift-out-ghost.png`](evidence/mcp/mcp-6-lift-out-ghost.png), [`mcp-7-moved-104-lit-door.png`](evidence/mcp/mcp-7-moved-104-lit-door.png).
+- **Not covered:** no real phone; the phone checks use emulated 390 px and Pixel 7 viewports.

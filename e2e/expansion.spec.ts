@@ -223,21 +223,35 @@ test.describe('phone at 390 px', () => {
     const tabs = await Promise.all([1, 2, 3].map(async (f) => (await tab(page, f).boundingBox())!))
     expect(new Set(tabs.map((t) => Math.round(t.y))).size).toBe(1)
 
-    await page.getByRole('link', { name: 'Jump to the map' }).click()
+    // The map starts on the first screen, right after the compact block.
     await expect(page.getByRole('tablist')).toBeInViewport()
+    await evidence(page, 'phone-390-0-load.png')
+    // The skip link is the first stop of the Tab order.
+    await page.keyboard.press('Tab')
+    const skip = page.getByRole('link', { name: 'Jump to the map' })
+    await expect(skip).toBeFocused()
+    await expect(skip).toBeInViewport()
 
     await page.getByRole('button', { name: 'Lift out of service' }).click()
     await expect(status(page)).toHaveText('No step-free route to Room 204. The lift is out of service.')
     await expect(page.getByTestId('ghost-trail-1')).toBeAttached()
     await noSidewaysScroll(page)
-    await evidence(page, 'phone-390-1-lift-out.png', true)
+    // Let the 0.5 s ghost animation finish so the screenshot shows the final state.
+    await page.waitForTimeout(700)
+    await evidence(page, 'phone-390-1-lift-out.png')
+    await evidence(page, 'phone-390-1-lift-out-full.png', true)
+    // Move options live under the map; the status links to them.
+    const map = (await page.getByRole('tabpanel').boundingBox())!
+    const move = (await page.getByRole('button', { name: 'Move event to Room 104' }).boundingBox())!
+    expect(move.y).toBeGreaterThan(map.y + map.height)
 
     await page.getByRole('button', { name: 'Move event to Room 104' }).click()
     await expect(page.getByRole('heading', { name: 'Directions to Room 104' })).toBeFocused()
     await page.getByRole('button', { name: 'Walk to Room 104 (Garden Hall).' }).click()
     await expect(page.getByRole('tabpanel')).toBeInViewport()
     await noSidewaysScroll(page)
-    await evidence(page, 'phone-390-2-moved-104.png', true)
+    await page.waitForTimeout(3400)
+    await evidence(page, 'phone-390-2-moved-104-full.png', true)
 
     // Every other state, including both "no suitable route" states, fits the width too.
     const states: [RegExp, string[]][] = [
@@ -252,5 +266,140 @@ test.describe('phone at 390 px', () => {
       }
       await expect(page.getByTestId('no-suitable-route')).toHaveText('No step-free alternative found.')
     }
+  })
+
+  test('focus order follows the visual order', async ({ page }) => {
+    await open(page)
+    await page.getByRole('button', { name: 'Lift out of service' }).click()
+    // Reload so Tab starts at the top of the document; the state stays in this tab's session.
+    await page.reload()
+    await expect(page.getByRole('button', { name: 'Lift out of service' })).toHaveAttribute('aria-pressed', 'true')
+    const stops: { name: string; y: number; x: number }[] = []
+    for (let i = 0; i < 40; i++) {
+      await page.keyboard.press('Tab')
+      const stop = await page.evaluate(() => {
+        const el = document.activeElement as HTMLElement | null
+        if (!el || el === document.body) return null
+        const r = el.getBoundingClientRect()
+        const label = el instanceof HTMLInputElement ? el.labels?.[0]?.textContent : null
+        const name = label ?? el.getAttribute('aria-label') ?? el.textContent ?? el.tagName
+        return { name: name.replace(/\s+/g, ' ').trim().slice(0, 40), y: r.top + window.scrollY, x: r.left }
+      })
+      if (!stop) break
+      stops.push(stop)
+      if (stops.length > 1 && stop.name === stops[0].name) break
+    }
+    const names = stops.map((s) => s.name)
+    // The compact block, then the map, then the move options, the comparison and the steps.
+    const at = (text: string) => names.findIndex((n) => n.startsWith(text))
+    expect(at('Lift out, move to Room 104')).toBeGreaterThan(at('Jump to the map'))
+    expect(at('Lift out of service')).toBeGreaterThan(at('Lift out, move to Room 104'))
+    expect(at('Floor 1')).toBeGreaterThan(at('Lift out of service'))
+    expect(at('Move event to Room 104')).toBeGreaterThan(at('Floor 1'))
+    // The profile radios are one Tab stop: the checked one.
+    expect(at('Step-free')).toBeGreaterThan(at('Move event to Room 104'))
+    expect(names.slice(0, 6)).toEqual([
+      'Jump to the map',
+      expect.stringMatching(/^Lift out, move to Room 104/),
+      'Lift out of service',
+      'Reset scenario',
+      expect.stringMatching(/^Move options below the map/),
+      expect.stringMatching(/^Floor 1/),
+    ])
+    // Every next stop is lower on the page, or further right on the same row.
+    for (let i = 2; i < stops.length; i++) {
+      const [a, b] = [stops[i - 1], stops[i]]
+      const sameRow = Math.abs(a.y - b.y) < 12
+      expect(sameRow ? b.x > a.x : b.y > a.y, `${a.name} → ${b.name}`).toBe(true)
+    }
+    await noSidewaysScroll(page)
+  })
+})
+
+test.describe('motion', () => {
+  test.skip(({ isMobile }) => isMobile, 'Motion checks run on desktop')
+
+  const running = (page: Page) =>
+    page.evaluate(() =>
+      document
+        .getAnimations()
+        .filter((a) => a.playState === 'running')
+        .map((a) => (a as CSSAnimation).animationName)
+        .filter(Boolean)
+        .sort(),
+    )
+
+  test('each animation runs once on its state change, never on floor or step changes', async ({ page }) => {
+    await open(page)
+    expect(await running(page)).toEqual([])
+
+    // Lift out: the old route turns into the dashed ghost trail. Status and actions are already there.
+    await page.getByRole('button', { name: 'Lift out of service' }).click()
+    await expect(status(page)).toHaveText('No step-free route to Room 204. The lift is out of service.')
+    await expect(page.getByRole('button', { name: 'Move event to Room 104' })).toBeEnabled()
+    expect(await running(page)).toEqual(expect.arrayContaining(['ghost-casing-fade', 'ghost-fade']))
+    await expect(page.locator('[data-anim="ghost"]')).toHaveCount(1)
+
+    // Looking at another floor does not replay it.
+    await showFloor(page, 2)
+    await showFloor(page, 1)
+    expect(await running(page)).toEqual([])
+    await expect(page.locator('[data-anim]')).toHaveCount(0)
+    await expect(page.getByTestId('ghost-trail-1')).toBeAttached()
+
+    // Confirm the move: the door of Room 104 lights up; focus moves at once.
+    await page.getByRole('button', { name: 'Move event to Room 104' }).click()
+    await expect(page.getByRole('heading', { name: 'Directions to Room 104' })).toBeFocused()
+    expect(await running(page)).toEqual(expect.arrayContaining(['door-glow', 'door-ring']))
+    await expect(page.getByTestId('lit-door')).toBeAttached()
+
+    // Selecting a step does not replay it.
+    await page.getByRole('button', { name: 'Walk to Room 104 (Garden Hall).' }).click()
+    expect(await running(page)).toEqual([])
+    await expect(page.getByTestId('lit-door')).toBeAttached()
+  })
+
+  test('gallery: the way round draws in from the divergence point, the marker stays "Door closed"', async ({ page }) => {
+    await open(page)
+    await pickScenario(page, /Gallery door closed/)
+    expect(await running(page)).toEqual([])
+    await page.getByRole('button', { name: 'Close central door' }).click()
+    await expect(status(page)).toContainText('still open via Side Entrance (ramp) → Lift → Gallery Walk')
+    expect(await running(page)).toEqual(['halo-in', 'route-draw', 'route-draw'])
+    await expect(page.getByTestId('failure-marker')).toContainText('Door closed')
+    // The drawn part is the detour only: it starts where the old route turned into the gallery.
+    const detour = page.locator('[data-anim="detour"]')
+    await expect(detour).toHaveCount(1)
+    expect(await detour.getAttribute('d')).toMatch(/^M320,200L120,200/)
+    await expect(page.getByTestId('detour-2')).toBeAttached()
+
+    await page.waitForTimeout(1700)
+    expect(await running(page)).toEqual([])
+    await showFloor(page, 1)
+    await showFloor(page, 2)
+    expect(await running(page)).toEqual([])
+  })
+
+  test('reduced motion: no animation, the final states at once', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await open(page)
+
+    await page.getByRole('button', { name: 'Lift out of service' }).click()
+    expect(await running(page)).toEqual([])
+    const ghost = page.getByTestId('ghost-trail-1').locator('.ghost-trail')
+    expect(await ghost.evaluate((el) => getComputedStyle(el).strokeDasharray)).toBe('10px, 8px')
+    expect(await ghost.evaluate((el) => getComputedStyle(el).stroke)).toBe('rgb(132, 117, 182)')
+
+    await page.getByRole('button', { name: 'Move event to Room 104' }).click()
+    expect(await running(page)).toEqual([])
+    const ring = page.getByTestId('lit-door').locator('.lit-door__ring')
+    expect(await ring.evaluate((el) => getComputedStyle(el).strokeWidth)).toBe('4px')
+
+    await pickScenario(page, /Gallery door closed/)
+    await page.getByRole('button', { name: 'Close central door' }).click()
+    expect(await running(page)).toEqual([])
+    const drawn = page.locator('[data-anim="detour"]')
+    expect(await drawn.evaluate((el) => getComputedStyle(el).strokeDashoffset)).toBe('0px')
+    expect(await page.getByTestId('detour-2').evaluate((el) => getComputedStyle(el).opacity)).toBe('0.35')
   })
 })

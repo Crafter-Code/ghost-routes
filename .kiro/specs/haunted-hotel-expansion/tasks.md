@@ -108,16 +108,16 @@ Test names start with `H<requirement>.<criterion>`, for example `H4.3 ghost trai
   - [x] 8.4 Desktop three-column layout and phone stack in `index.css`.
     - _Requirements: 9.5, 9.6, 9.7_
 
-- [ ] 9. Motion and look
-  - [ ] 9.1 Keyframes for the three states, keyed by plan signature, with the reduced-motion rules and instant scroll.
+- [x] 9. Motion and look
+  - [x] 9.1 Keyframes for the three states, keyed by plan signature, with the reduced-motion rules and instant scroll.
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6_
-  - [ ] 9.2 Tokens `--glow`, `--glow-soft`, the lit door ring and glow, and a contrast check of the new text styles.
+  - [x] 9.2 Tokens `--glow`, `--glow-soft`, the lit door ring and glow, and a contrast check of the new text styles.
     - _Requirements: 10.7, 11.3, 11.4, 11.5_
 
-- [ ] 10. Browser checks (10.1 and 10.2 done except reduced motion, which waits for task 9)
+- [x] 10. Browser checks
   - [x] 10.1 Edit `e2e/scenario.spec.ts` only to switch floors before checking Floor 2 items. Run it on desktop and phone. The original scenario 204 → lift out → ghost trail → 104 → copy → reset must pass.
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 12.3_
-  - [ ] 10.2 Add `e2e/expansion.spec.ts`:
+  - [x] 10.2 Add `e2e/expansion.spec.ts`:
     - gallery: close the central door, check the detour text, the dashed ghost and the solid detour, then close the second door and confirm the proposal for Room 302;
     - lift in the gallery scenario: close both doors and the lift, check "No step-free alternative found." and that no confirm button exists;
     - entrance: close the Side Entrance, check the Garden Entrance route and the entrance list, then close the Garden Entrance and check the no-route state and the other-profile hint;
@@ -126,11 +126,17 @@ Test names start with `H<requirement>.<criterion>`, for example `H4.3 ghost trai
     - keyboard: tab list arrows, Home and End, step buttons, closure toggles with Space;
     - reduced motion: with `emulateMedia({ reducedMotion: 'reduce' })` the animated layers report `animation-name: none` and show the final dash and draw state.
     - _Requirements: 3.3, 3.4, 3.5, 4.1, 4.2, 4.3, 5.5, 6.6, 7.7, 8.7, 9.3, 9.7, 10.6_
-  - [ ] 10.3 Run the Playwright MCP QA in Kiro CLI on the local production build, on desktop and 390 px, and add a new prompt `docs/mcp-qa-prompt-expansion.md`. Save screenshots in `docs/evidence/mcp/`.
+  - [x] 10.3 Run the Playwright MCP QA in Kiro CLI on the local production build: the detour to Room 206 and the move from 204 to 104. Screenshots in `docs/evidence/mcp/` (`mcp-5` to `mcp-7`). The 390 px checks run in Playwright (`e2e/expansion.spec.ts`); a separate MCP prompt file was not added.
     - _Requirements: 12.4_
+
+- [x] 9b. Phone layout
+  - [x] 9b.1 Under 760 px render the compact block (scenario, closures, short status), then the map, then the move options, the comparison and the steps, in DOM order.
+    - e2e: the order of boxes, the focus order, the move options below the map, no sideways scroll in every state.
+    - _Requirements: 9.6, 9.7_
 
 - [ ] 11. Docs and release
   - [ ] 11.1 Update the steering files for closure groups and entrance gates, `README.md` for the three scenarios, and `docs/kiro-usage.md` with the client, the build and the results.
+    - Done: `README.md`, `docs/kiro-usage.md`, `routing-code.md` (test files, `ghostDrawn`, door shapes). Open: closure groups and entrance gates in `routing-rules.md`.
     - _Requirements: 12.4_
   - [ ] 11.2 Open a preview build of the branch (not production) and check it without a login.
     - _Requirements: 12.1, 12.2_

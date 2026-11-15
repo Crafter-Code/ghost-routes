@@ -48,7 +48,7 @@ export function ScenarioButtons({ plan, dispatch }: { plan: ScenarioPlan; dispat
   const controls = SCENARIOS[plan.state.scenario].controls
   return (
     <section className="card actions" aria-labelledby="actions-title">
-      <h2 id="actions-title" className="card__title">
+      <h2 id="actions-title" className="card__title actions__title">
         Organizer action
       </h2>
       <div className="actions__buttons">
@@ -100,10 +100,21 @@ function checkedAgainst(plan: ScenarioPlan): string {
   return `Checked with the same ${rules} rules and ${what}:`
 }
 
-export function StatusPanel({ plan, onConfirm }: { plan: ScenarioPlan; onConfirm: (room: string) => void }) {
+export const MOVE_OPTIONS_ID = 'move-options'
+
+/** Whether the details card has anything to show. */
+export function hasStatusDetails(plan: ScenarioPlan): boolean {
+  const entrances = plan.entranceChecks.some((check) => plan.closed.has(check.gate))
+  return entrances || (!plan.route.found && plan.candidates.length > 0) || plan.otherProfileHint !== null
+}
+
+/**
+ * The short status: the live region and the note about the ghost trail. Updated in the same render as
+ * the state, so text, actions and focus never wait for an animation.
+ */
+export function StatusSummary({ plan, linkToDetails }: { plan: ScenarioPlan; linkToDetails: boolean }) {
   const note = ghostNote(plan)
-  const stepFree = plan.state.profile === 'step-free'
-  const showEntrances = plan.entranceChecks.some((check) => plan.closed.has(check.gate))
+  const moveLink = linkToDetails && hasStatusDetails(plan)
   return (
     <section className="card status-card" aria-label="Route status">
       <p role="status" aria-live="polite" aria-atomic="true" className={`status status--${plan.status.tone}`} data-testid="status">
@@ -115,6 +126,22 @@ export function StatusPanel({ plan, onConfirm }: { plan: ScenarioPlan; onConfirm
           {note}
         </p>
       )}
+      {moveLink && (
+        <a className="status-card__more" href={`#${MOVE_OPTIONS_ID}`}>
+          {plan.proposal ? `Move options below the map (${HOTEL.nodes[plan.proposal.room].label} checked)` : 'Details below the map'}
+        </a>
+      )}
+    </section>
+  )
+}
+
+/** Entrance check, the relocation proposal and the other-profile hint. */
+export function StatusDetails({ plan, onConfirm }: { plan: ScenarioPlan; onConfirm: (room: string) => void }) {
+  if (!hasStatusDetails(plan)) return null
+  const stepFree = plan.state.profile === 'step-free'
+  const showEntrances = plan.entranceChecks.some((check) => plan.closed.has(check.gate))
+  return (
+    <section className="card status-details" id={MOVE_OPTIONS_ID} aria-label="Move options" tabIndex={-1}>
       {showEntrances && (
         <div className="checks" data-testid="entrance-checks">
           <h2 className="checks__title">Entrances checked</h2>

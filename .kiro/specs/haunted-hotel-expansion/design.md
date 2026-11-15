@@ -379,7 +379,9 @@ All three effects are CSS keyframes on elements that always exist in their final
 | 2. The detour draws in | a route that leaves the baseline (`divergeAt` is not null) | the legs after `divergeAt` use `pathLength=1`, `stroke-dasharray: 1` and `stroke-dashoffset` from 1 to 0 | starts at 0.45 s, lasts 0.9 s, ease out | fully drawn from the first frame |
 | 3. The new room's door lights up | `confirm-move` | a radial glow around the door of the new room, and the door ring | two pulses in 3.2 s, then a steady ring | steady ring from the first frame, no pulse |
 
-- Layers are keyed by a plan signature (closed edges, route leg ids, event room). A new signature replays the animation. Switching floors or selecting a step does not change the signature.
+- `App` keeps one signature per animation (drawn ghost legs, route legs, moved-to room) and passes a `MapAnimation` to the large `FloorPlan`. A changed signature becomes a React key, so the animated element remounts and its keyframes run once. Selecting a floor or a step clears `MapAnimation`, so the plan is drawn in its final state and nothing replays. The mini plans never animate.
+- The detour is the part of `plan.route` from `plan.divergeAt` on; the shared legs are drawn without animation. Its paths use `pathLength=1`, so `stroke-dasharray: 1` and `stroke-dashoffset` 1 → 0 draw it from the divergence point.
+- The lit door is the door shape of the route's last edge (for Room 104 that is `door-104`), or the room node when there is none.
 - The status text, focus move and live regions are set in the same render, not after the animation.
 - `@media (prefers-reduced-motion: reduce)` sets `animation: none` and `transition: none` for these classes. Scrolling to the map uses `behavior: 'auto'` in that case.
 - Meaning never depends on motion: dashed shape, lock, ghost icon, ring and the text in the status carry it.

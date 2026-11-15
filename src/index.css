@@ -25,6 +25,9 @@
   --carpet-glow: #e8b04a;
   --carpet-night: #3b2340;
   --focus: #1b5fd1;
+  /* Lantern glow on the door of the room an event moved to. */
+  --glow: #f3b94a;
+  --glow-ring: #c77a00;
   --radius: 14px;
 
   color-scheme: light;
@@ -145,6 +148,17 @@ textarea {
   min-width: 0;
 }
 
+/* Phone: one column in DOM order (App renders the compact block, then the map, then the details). */
+.layout--narrow > * {
+  grid-area: auto;
+}
+.status-card__more {
+  display: inline-block;
+  margin-top: 8px;
+  font-weight: 700;
+  color: var(--burgundy);
+}
+
 @media (min-width: 760px) {
   .layout {
     grid-template-columns: 300px minmax(0, 1fr);
@@ -191,12 +205,76 @@ textarea {
   .card {
     padding: 10px 12px;
   }
-  .skip-link {
-    position: static;
-    display: inline-block;
-    margin-bottom: 8px;
-    padding: 6px 14px;
+  .masthead__title {
+    font-size: 2rem;
+  }
+  .masthead__lead {
+    margin: 0;
+  }
+  /* The compact block: scenario, closures and the short status in one card, right above the map. */
+  .compact-block {
+    display: grid;
+    gap: 10px;
+    background: var(--paper);
+    border: 2px solid var(--burgundy);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+  }
+  .compact-block > .card {
+    border: 0;
+    padding: 0;
+    background: none;
+    border-radius: 0;
+  }
+  .compact-block .card__title {
+    margin-bottom: 2px;
+    font-size: 1rem;
+  }
+  .compact-block .picker__option {
+    margin-top: 4px;
+    padding: 4px 10px;
+  }
+  .compact-block .actions__title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .compact-block .actions__buttons {
+    gap: 8px;
+  }
+  .compact-block .toggle,
+  .compact-block .button {
+    padding: 4px 10px;
+    font-size: 0.9rem;
+    min-height: 40px;
+  }
+  .compact-block .toggle {
+    gap: 8px;
+  }
+  .compact-block .toggle__track {
+    width: 34px;
+    height: 20px;
+  }
+  .compact-block .toggle__thumb {
+    width: 14px;
+    height: 14px;
+  }
+  .compact-block .toggle.is-on .toggle__thumb {
+    transform: translateX(14px);
+  }
+  .compact-block .ghost-note {
+    margin-top: 6px;
+    font-size: 0.9rem;
+  }
+  .compact-block .status-card__more {
+    margin-top: 4px;
     font-size: 0.92rem;
+  }
+  .compact-block .status {
+    padding: 8px 10px;
   }
 }
 
@@ -766,6 +844,22 @@ fieldset.card > legend + * {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+.route-halo {
+  fill: none;
+  stroke: var(--route);
+  stroke-width: 26;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.35;
+}
+.lit-door__glow {
+  opacity: 0;
+}
+.lit-door__ring {
+  fill: none;
+  stroke: var(--glow-ring);
+  stroke-width: 4;
+}
 .route-highlight {
   fill: none;
   stroke: var(--burgundy);
@@ -927,8 +1021,111 @@ fieldset.card > legend + * {
   text-align: center;
 }
 
+/* Motion. Every animated element already has its final look in the rules above; the keyframes only
+   lead into it. With reduced motion the animations are switched off and the final state shows at once. */
+@keyframes ghost-fade {
+  from {
+    stroke: var(--route);
+    stroke-dasharray: 10 0;
+  }
+  to {
+    stroke: var(--ghost-line);
+    stroke-dasharray: 10 8;
+  }
+}
+@keyframes ghost-casing-fade {
+  from {
+    stroke: var(--route-casing);
+    stroke-width: 13;
+    stroke-dasharray: 10 0;
+  }
+  to {
+    stroke: var(--paper);
+    stroke-width: 10;
+    stroke-dasharray: 10 8;
+  }
+}
+.anim-ghost .ghost-trail {
+  animation: ghost-fade 0.5s ease-in-out both;
+}
+.anim-ghost .ghost-trail-casing {
+  animation: ghost-casing-fade 0.5s ease-in-out both;
+}
+
+/* The detour draws in from the divergence point: pathLength is 1, so one dash covers the path. */
+@keyframes route-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.anim-draw {
+  stroke-dasharray: 1;
+  animation: route-draw 0.9s ease-out 0.45s both;
+}
+@keyframes halo-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.35;
+  }
+}
+.anim-halo {
+  animation: halo-in 0.4s ease-out 1.2s both;
+}
+
+/* The new room's door: two warm pulses in 3.2 s, then a steady ring. */
+@keyframes door-glow {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.3;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes door-ring {
+  0% {
+    stroke-width: 0;
+  }
+  20% {
+    stroke-width: 9;
+  }
+  100% {
+    stroke-width: 4;
+  }
+}
+.anim-door .lit-door__glow {
+  animation: door-glow 3.2s ease-in-out both;
+}
+.anim-door .lit-door__ring {
+  animation: door-ring 3.2s ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;
+  }
+  .anim-ghost .ghost-trail,
+  .anim-ghost .ghost-trail-casing,
+  .anim-draw,
+  .anim-halo,
+  .anim-door .lit-door__glow,
+  .anim-door .lit-door__ring {
+    animation: none !important;
+  }
+  html {
+    scroll-behavior: auto;
   }
 }

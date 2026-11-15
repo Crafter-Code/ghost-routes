@@ -4,7 +4,7 @@ import type { ScenarioPlan } from '../routing/plan'
 import type { FloorId, GraphEdge, Leg } from '../routing/types'
 import { CarpetPattern } from './carpets'
 import { floorRides, legsOnFloor, lockSpots, type LockSpot } from './floorData'
-import { layoutFor, VIEW_WIDTH, type RoomShape } from './layout'
+import { doorFor, layoutFor, VIEW_WIDTH, type RoomShape } from './layout'
 
 const nodeAt = (id: string) => HOTEL.nodes[id]
 
@@ -142,6 +142,22 @@ function describeFloor(plan: ScenarioPlan, floor: FloorId, locks: LockSpot[]): s
   return parts.join(' ')
 }
 
+/**
+ * Which animations this render carries. Each value is the signature of the plan part that changed
+ * (used as a React key, so a new change restarts the animation); null shows the final state.
+ * App clears all three when the visitor switches floors or selects a step, so nothing replays.
+ */
+export interface MapAnimation {
+  /** The old route turns into the dashed ghost trail. */
+  ghost: string | null
+  /** The detour draws in from the point where the routes part. */
+  detour: string | null
+  /** The door of the room the event moved to lights up. */
+  door: string | null
+}
+
+const STILL: MapAnimation = { ghost: null, detour: null, door: null }
+
 export interface FloorPlanProps {
   plan: ScenarioPlan
   floor: FloorId
@@ -149,13 +165,25 @@ export interface FloorPlanProps {
   compact?: boolean
   /** Indexes into plan.route.legs to highlight (the selected text step). */
   highlight?: readonly number[]
+  animation?: MapAnimation
 }
 
-export function FloorPlan({ plan, floor, compact = false, highlight = [] }: FloorPlanProps) {
+export function FloorPlan({ plan, floor, compact = false, highlight = [], animation = STILL }: FloorPlanProps) {
   const layout = layoutFor(floor)
   const uid = useId().replace(/:/g, '')
   const carpetId = `carpet-${floor}-${uid}`
   const route = plan.route.found ? legsOnFloor(plan.route.legs, floor) : []
+  // A detour: legs from the divergence point on are the newly found way round.
+  const parted = plan.route.found && plan.divergeAt !== null ? plan.divergeAt : null
+  const freshLegs = parted === null ? [] : legsOnFloor(plan.route.legs.slice(parted), floor)
+  const sharedLegs = parted === null ? route : legsOnFloor(plan.route.legs.slice(0, parted), floor)
+  const anim = compact ? STILL : animation
+  // The door of the room the event moved to: the door its last leg passes, else the room node.
+  const lastLeg = plan.route.found ? plan.route.legs[plan.route.legs.length - 1] : null
+  const litDoor =
+    plan.state.movedFrom && lastLeg && nodeAt(plan.target).floor === floor
+      ? (doorFor(lastLeg.edge.id, floor) ?? nodeAt(plan.target))
+      : null
   const ghost = plan.ghostDrawn ? legsOnFloor(plan.ghostDrawn.legs, floor) : []
   const highlighted = highlight.map((i) => plan.route.legs[i]).filter(Boolean)
   const highlightOnFloor = legsOnFloor(highlighted, floor)
@@ -183,6 +211,11 @@ export function FloorPlan({ plan, floor, compact = false, highlight = [] }: Floo
       {!compact && <desc id={descId}>{describeFloor(plan, floor, locks)}</desc>}
       <defs>
         <CarpetPattern id={carpetId} floor={floor} />
+        <radialGradient id={`glow-${uid}`}>
+          <stop offset="0" stopColor="var(--glow)" stopOpacity="0.95" />
+          <stop offset="0.55" stopColor="var(--glow)" stopOpacity="0.45" />
+          <stop offset="1" stopColor="var(--glow)" stopOpacity="0" />
+        </radialGradient>
       </defs>
 
       {layout.outdoor && (
@@ -241,7 +274,12 @@ export function FloorPlan({ plan, floor, compact = false, highlight = [] }: Floo
 
       <g aria-hidden="true">
         {ghost.length > 0 && (
-          <g data-testid={testId(`ghost-trail-${floor}`)}>
+          <g
+            key={anim.ghost ?? 'still'}
+            className={anim.ghost ? 'anim-ghost' : undefined}
+            data-testid={testId(`ghost-trail-${floor}`)}
+            data-anim={anim.ghost ? 'ghost' : undefined}
+          >
             <path d={pathFor(ghost)} className="ghost-trail-casing" />
             <path d={pathFor(ghost)} className="ghost-trail" />
           </g>
@@ -249,11 +287,48 @@ export function FloorPlan({ plan, floor, compact = false, highlight = [] }: Floo
         {highlightOnFloor.length > 0 && (
           <path d={pathFor(highlightOnFloor)} className="route-highlight" data-testid={testId(`highlight-${floor}`)} />
         )}
+        {freshLegs.length > 0 && (
+          // Soft amber halo under the way round, so the detour stands out after it is drawn.
+          <path
+            key={`halo-${anim.detour ?? 'still'}`}
+            d={pathFor(freshLegs)}
+            className={`route-halo${anim.detour ? ' anim-halo' : ''}`}
+            data-testid={testId(`detour-${floor}`)}
+          />
+        )}
         {route.length > 0 && (
-          <>
-            <path d={pathFor(route)} className="route-casing" />
-            <path d={pathFor(route)} className="route" data-testid={testId(`route-${floor}`)} />
-          </>
+          <g data-testid={testId(`route-${floor}`)}>
+            {sharedLegs.length > 0 && <path d={pathFor(sharedLegs)} className="route-casing" />}
+            {freshLegs.length > 0 && (
+              <path
+                key={`casing-${anim.detour ?? 'still'}`}
+                d={pathFor(freshLegs)}
+                pathLength={1}
+                className={`route-casing${anim.detour ? ' anim-draw' : ''}`}
+              />
+            )}
+            {sharedLegs.length > 0 && <path d={pathFor(sharedLegs)} className="route" />}
+            {freshLegs.length > 0 && (
+              <path
+                key={`route-${anim.detour ?? 'still'}`}
+                d={pathFor(freshLegs)}
+                pathLength={1}
+                className={`route${anim.detour ? ' anim-draw' : ''}`}
+                data-anim={anim.detour ? 'detour' : undefined}
+              />
+            )}
+          </g>
+        )}
+        {litDoor && (
+          <g
+            key={anim.door ?? 'still'}
+            className={`lit-door${anim.door ? ' anim-door' : ''}`}
+            data-testid={testId('lit-door')}
+            data-anim={anim.door ? 'door' : undefined}
+          >
+            <circle cx={litDoor.x} cy={litDoor.y} r={40} className="lit-door__glow" fill={`url(#glow-${uid})`} />
+            <circle cx={litDoor.x} cy={litDoor.y} r={20} className="lit-door__ring" />
+          </g>
         )}
         {highlightRings.map((n) => (
           <circle key={n.id} cx={n.x} cy={n.y} r={17} className="step-ring" data-testid={testId(`highlight-${floor}`)} />

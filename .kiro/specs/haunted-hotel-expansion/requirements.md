@@ -162,7 +162,7 @@ Terms from the Ghost Routes spec (Graph, Transition, Profile, Route result, Base
 3. THE switcher SHALL be a tab list: arrow keys move between floors, Home and End go to the first and last floor, and the selected floor has `aria-selected="true"`.
 4. WHEN the route, the ghost trail or a closure changes THE SYSTEM SHALL NOT change the focused floor. THE focused floor SHALL change only when the visitor selects a floor or a step, picks a scenario (its floor: 1 for the lift and the Side Entrance, 2 for the gallery), confirms a move (the new room's floor), or resets (Floor 1).
 5. WHERE the viewport is at least 1180 px wide THE SYSTEM SHALL show three columns: scenario, organizer action and block status on the left, the floor switcher and map in the middle (the widest column), and the guest steps on the right. From 760 px to 1179 px the guest steps move under the map.
-6. WHERE the viewport is under 760 px THE SYSTEM SHALL stack them in this order: scenario, route comparison, organizer action, block status, floor switcher, map, guest steps, and SHALL offer a "Jump to the map" link at the top of the page.
+6. WHERE the viewport is under 760 px THE SYSTEM SHALL stack them in this order: a compact block (scenario, closure controls, short status), the floor switcher and the map, then the move options and entrance check, the route comparison and the guest steps. THE DOM order SHALL be the visual order, so keyboard focus follows it. THE short status SHALL link to the move options when there are any, and a "Jump to the map" skip link SHALL be the first Tab stop.
 7. AT 390 px width THE page SHALL NOT scroll sideways and the floor switcher SHALL fit in one row.
 8. WHEN the focused floor changes THE SYSTEM SHALL announce "Showing Floor <n>." in a polite live region that is separate from the route status.
 
@@ -173,9 +173,9 @@ Terms from the Ghost Routes spec (Graph, Transition, Profile, Route result, Base
 #### Acceptance Criteria
 
 1. WHEN a closure turns an old route into a ghost trail THE SYSTEM SHALL change the line from solid to dashed in 0.5 s.
-2. WHEN a detour exists THE SYSTEM SHALL draw it from the point where it leaves the old route, in 0.9 s, starting 0.45 s after the closure.
+2. WHEN a detour exists THE SYSTEM SHALL draw it from the point where it leaves the old route, in 0.9 s, starting 0.45 s after the closure, and SHALL then keep a soft amber halo under the way round. For the gallery's central door the existing "Door closed" marker stays the only mark of the break.
 3. WHEN the visitor confirms a move THE SYSTEM SHALL light the door of the new room with a local glow that pulses twice in 3.2 s and then stays as a steady ring.
-4. THE animations SHALL run only when the plan changes. Changing the focused floor or selecting a step SHALL NOT replay them.
+4. THE animations SHALL run only when their own part of the plan changes: the drawn ghost trail, the route legs, or the room an event moved to. The first page load SHALL NOT animate. Changing the focused floor or selecting a step SHALL NOT replay them.
 5. THE status text, focus and live regions SHALL update at once and SHALL NOT wait for an animation.
 6. WHERE the visitor prefers reduced motion THE SYSTEM SHALL show the same three states at once, with no animation and no smooth scrolling.
 7. THE meaning of each state SHALL NOT depend on motion or on color alone: a dashed line, a lock, a ghost icon, a ring and text carry it.
