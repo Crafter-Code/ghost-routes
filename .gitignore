@@ -17,3 +17,6 @@ coverage/
 !docs/evidence/*.log
 
 # Note: .kiro/ is intentionally tracked (specs, hooks, steering, agents).
+
+# Playwright MCP working files
+.playwright-mcp/
