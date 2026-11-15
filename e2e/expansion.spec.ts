@@ -26,6 +26,8 @@ async function pickScenario(page: Page, name: RegExp) {
 
 async function evidence(page: Page, name: string, fullPage = false) {
   if (!EVIDENCE) return
+  // Screenshots show the final state: wait until no animation is running (the detour draws in after 0.45 s).
+  await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== 'running'))
   await page.evaluate(() => window.scrollTo(0, 0))
   await page.screenshot({ path: `${EVIDENCE}/${name}`, fullPage })
 }
@@ -268,8 +270,6 @@ test.describe('phone at 390 px', () => {
     await expect(status(page)).toHaveText('No step-free route to Room 204. The lift is out of service.')
     await expect(page.getByTestId('ghost-trail-1')).toBeAttached()
     await noSidewaysScroll(page)
-    // Let the 0.5 s ghost animation finish so the screenshot shows the final state.
-    await page.waitForTimeout(700)
     await evidence(page, 'phone-390-1-lift-out.png')
     await evidence(page, 'phone-390-1-lift-out-full.png', true)
     // Move options live under the map; the status links to them.
@@ -282,7 +282,6 @@ test.describe('phone at 390 px', () => {
     await page.getByRole('button', { name: 'Walk to Room 104 (Garden Hall).' }).click()
     await expect(page.getByRole('tabpanel')).toBeInViewport()
     await noSidewaysScroll(page)
-    await page.waitForTimeout(3400)
     await evidence(page, 'phone-390-2-moved-104-full.png', true)
 
     // Every other state, including both "no suitable route" states, fits the width too.
