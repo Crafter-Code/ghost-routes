@@ -147,6 +147,38 @@ test.describe('desktop', () => {
     await evidence(page, 'desktop-floor-1-garden-entrance.png')
   })
 
+  test('copy and reset in the gallery detour and the Garden Entrance route', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+    await open(page)
+
+    await pickScenario(page, /Gallery door closed/)
+    await page.getByRole('button', { name: 'Close central door' }).click()
+    await page.getByRole('button', { name: 'Copy guest directions' }).click()
+    await expect(page.getByText('Copied: entrance, floor and steps.')).toBeVisible()
+    const gallery = await page.evaluate(() => navigator.clipboard.readText())
+    expect(gallery).toContain('Event: Room 206 (Portrait Gallery)')
+    expect(gallery).toContain('Entrance: Side Entrance (ramp, step-free)')
+    expect(gallery).toContain('Floor: 2')
+    expect(gallery).toMatch(/^1\. Start at the hotel forecourt\.$/m)
+
+    await pickScenario(page, /Side Entrance closed/)
+    await page.getByRole('button', { name: 'Close Side Entrance' }).click()
+    await page.getByRole('button', { name: 'Copy guest directions' }).click()
+    await expect(page.getByText('Copied: entrance, floor and steps.')).toBeVisible()
+    const garden = await page.evaluate(() => navigator.clipboard.readText())
+    expect(garden).toContain('Event: Room 204 (Gold Room)')
+    expect(garden).toContain('Entrance: Garden Entrance (level, step-free)')
+    expect(garden).toContain('Walk through the garden vestibule to the lift door on Floor 1.')
+
+    // Reset returns to the default scenario: lift scenario, Room 204, nothing closed, Floor 1.
+    await page.getByRole('button', { name: 'Reset scenario' }).click()
+    await expect(page.getByRole('radio', { name: /Lift out, move to Room 104/ })).toBeChecked()
+    await expect(page.getByRole('heading', { name: 'Directions to Room 204' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Lift out of service' })).toHaveAttribute('aria-pressed', 'false')
+    await expect(status(page)).toHaveText('Step-free route to Room 204 ready via Side Entrance (ramp) → Lift.')
+    await expect(tab(page, 1)).toHaveAttribute('aria-selected', 'true')
+  })
+
   test('no suitable route: nothing to confirm, the ghost and the locks stay', async ({ page }) => {
     await open(page)
     await pickScenario(page, /Side Entrance closed/)
