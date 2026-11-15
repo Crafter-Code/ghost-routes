@@ -10,78 +10,80 @@ Copy each section into the matching Devpost field. Text in `[brackets]` is a pla
 
 ## Tagline
 
-Step-free hotel routing that shows where your route broke, as a ghost.
+Step-free routing for a haunted hotel: see where your route broke, and the way round.
 
 ## Inspiration / the problem
 
-Event organizers book rooms. Then the lift stops working.
+Event organizers book rooms. Then a lift stops or a door is locked.
 
-A workshop is booked in Room 204 on the second floor. The crew brings heavy equipment on a cart, so they need a route without steps. When the lift goes out, the booking is still there, but the route to it is gone. Most maps show only the route that works now. They do not show what changed, so the organizer has to work out by hand where the usual route fails and which other room the cart can still reach.
+A workshop is booked on the second floor, and the crew brings heavy equipment on a cart, so they need a route without steps. When the lift goes out or a door closes, the booking is still there, but the route to it may be gone, or longer, or start at a different entrance. Most maps show only the route that works now. They do not show what changed, so the organizer works out by hand where the usual route fails, whether there is a way round, and which room the cart can still reach.
 
-Ghost Routes is for event organizers, venue staff, and anyone who moves a wheelchair, pram, or cart through a building: people who need a step-free route and need to know when it disappears.
+Ghost Routes is for event organizers, venue staff, and anyone who moves a wheelchair, pram, or cart through a building: people who need a step-free route and need to know when it changes.
 
 ## What it does
 
-Ghost Routes plans routes inside The Hollowmere Hotel, a fictional two-floor hotel.
+Ghost Routes plans routes inside The Hollowmere Hotel, a fictional three-floor hotel. Pick one of three situations, close a transition, and the map, the status and the guest directions change together.
 
-1. It shows two routes to Room 204 side by side. *Steps allowed* goes through the Main Entrance front steps and the Grand Staircase. *Step-free* goes through the Side Entrance ramp and the lift.
-2. You mark the lift **out of service**. Step-free now reads: "No step-free route to Room 204. The lift is out of service." The guest route over the Grand Staircase stays open.
-3. A dashed **ghost trail** shows the old step-free route and stops at the lift door on Floor 1. It marks where the route died.
-4. The app proposes a new room only after it has checked a step-free route to it. Room 203 is checked and rejected. Room 104 is confirmed. One button moves the event.
-5. **Copy guest directions** gives the entrance, the floor and numbered steps.
-6. **Reset scenario** starts again.
+1. **Gallery door closed (Room 206).** The central door of the Portrait Gallery closes. The app finds the way round to the same room: along the west passage and the Gallery Walk to the gallery's south door, 1 min 11 s longer. The closed door is marked "Door closed". Close the second door too and the app offers the Moonlight Hall on Floor 3 instead.
+2. **Lift out, move 204 → 104.** With the lift out of service there is no step-free route to Room 204: "No step-free route to Room 204. The lift is out of service." The old route turns into a dashed ghost trail that stops at the lift door on Floor 1. Room 203 is checked and rejected, Room 104 is checked and confirmed, and one button moves the event. Guests on foot can still use the Grand Staircase.
+3. **Side Entrance closed.** The ramp door is locked. The app checks all three entrances and routes the cart through the level Garden Entrance and its vestibule (+25 s). If the Garden Entrance closes too, it says plainly: "No step-free alternative found."
 
-There is no login and no server. Each visitor's changes stay in their own browser tab.
+**Copy guest directions** gives the entrance, the floor and numbered steps. Selecting a step opens its floor on the map. **Reset scenario** starts again. The site works on a phone, with the keyboard alone, and with reduced motion. There is no login and no server; each visitor's changes stay in their own browser tab.
 
 ## The ghost trail
 
 The ghost trail is the route you used to have, drawn up to the point where it stops working.
 
-The app computes the same route twice for the same profile: once with every transition open (the baseline) and once with the lift closed. The ghost trail is the part of the baseline route from the start up to, but not including, the first closed transition. For the lift outage it ends at the lift door on Floor 1. The trail is dashed and the active route is solid, so the two are different without relying on color.
+The app computes the route twice for the same profile: once with every transition open (the baseline) and once with the current closures. The ghost trail is the part of the baseline from the start up to, but not including, the first closed transition.
 
-The route and the text directions come from one route result per render, so the map and the written steps cannot disagree.
+- **No way round:** the whole old route is drawn as a dashed lilac line up to the blockage. For the lift outage it ends at the lift door on Floor 1, with a lock and the caption "Lift out of service".
+- **A way round:** the part both routes share is drawn once, as the solid amber route. The dashes start where the routes part. At the gallery the new route turns away right at the closed door, so nothing is dashed and the "Door closed" marker shows where the old route broke.
+
+Each change animates once: the old route fades into dashes, the way round draws in from the point where it leaves the old route, and the door of a newly chosen room lights up. With reduced motion every state appears at once. The map, the floor switcher and the text directions read one route result per render, so they cannot disagree.
 
 ## How to test the demo
 
 Open https://ghost-routes.pages.dev/. No login. Desktop or phone.
 
-1. Under **Routes to Room 204**, compare *Steps allowed* and *Step-free*.
-2. Press **Lift out of service**. The status turns red, and a lock appears on the lift on both floors.
-3. Look at Floor 1: the dashed trail ends at the lift door.
-4. Select *Steps allowed*: the Grand Staircase route is still open. Select *Step-free* again.
-5. Under **Move the event?**, check that Room 203 is rejected and Room 104 is confirmed. Press **Move event to Room 104**.
-6. Press **Copy guest directions**.
-7. Press **Reset scenario**.
-
-Every control also works with the keyboard alone.
+1. Pick **Gallery door closed** and press **Close central door**. The amber route draws in along the Gallery Walk; the central door shows **Door closed**. The status says the route adds 1 min 11 s.
+2. Pick **Lift out, move to Room 104** and press **Lift out of service**. On Floor 1 the old route turns into a dashed trail that stops at the lift door. Under **Move the event?**, Room 203 is rejected and Room 104 is confirmed. Press **Move event to Room 104**: the door of Room 104 lights up.
+3. Press **Copy guest directions**, then **Reset scenario**.
+4. Optional: pick **Side Entrance closed**, press **Close Side Entrance** (the Garden Entrance route) and then **Close Garden Entrance** (no step-free alternative).
 
 ## Costume Contest angle
 
-Ghost Routes is a routing tool dressed as a haunted hotel. The costume carries the meaning: the ghost trail is the old route, still drawn on the plan, that no longer works.
+Ghost Routes is a routing tool dressed as a haunted hotel, and the costume carries the meaning. The ghost trail is the old route, still drawn on the plan, that no longer works. A lock and a small ghost sit where it broke. When a way round exists, it draws itself in amber from the exact point where it leaves the old route. When the event has to move, the door of the new room glows like a lantern.
 
-For an organizer, the ghost trail answers the first question after a lift outage: where does my usual route stop? It shows the step-free route they planned, from the forecourt up the side ramp and along the corridor, and it ends at the closed lift door on Floor 1. The organizer sees why the workshop cannot stay in Room 204: the cart can reach the door, and the lift behind it is out of service. Staff can explain this to a crew in one look.
+For an organizer that answers three questions in one look: where does my usual route stop, is there a way round to the same room, and if not, which room can the cart still reach? Room 104 and the Moonlight Hall are offered only after the same routing function, with the same profile and the same closures, finds a route without steps to them.
 
-The app then proposes a new room, and it does so only after it has checked a step-free route to it. Room 203 is checked first and rejected. Room 104 is offered because the same routing function, with the same profile and the lift closed, finds a route without steps to it. The routing underneath is ordinary and tested: one graph, one shortest-path function, and rules for who may use which transition. The haunted-hotel look, with a ghost and a lock on the broken lift and a cream-and-burgundy plan, makes that result easy to remember.
+The routing underneath is ordinary and tested: one graph, one shortest-path function, and rules for who may use which transition. The cream plans, burgundy walls, a different original carpet on each floor (hexagons, lanterns, crescent moons), the Library with its shelves and the Moonlight Hall with its inlaid moon make the result easy to remember.
 
 ## How we used Kiro
 
 Everything below is backed by a file, a test, or a log in the repository. [`docs/kiro-usage.md`](https://github.com/Crafter-Code/ghost-routes/blob/main/docs/kiro-usage.md) has the details.
 
-**Kiro Crew (Claude Opus 5.5): first implementation.** From a 12-point brief, the agent wrote the spec first, then the app: a React + TypeScript + Vite single-page app with one hotel graph, one routing function, the lift outage, the ghost trail, the verified move to Room 104, reset, and a per-visitor session.
+**Two requirements-first specs.** [`.kiro/specs/ghost-routes/`](https://github.com/Crafter-Code/ghost-routes/tree/main/.kiro/specs/ghost-routes) describes the first release (the lift outage and the move to Room 104, 9 requirements). [`.kiro/specs/haunted-hotel-expansion/`](https://github.com/Crafter-Code/ghost-routes/tree/main/.kiro/specs/haunted-hotel-expansion) describes the three-floor expansion (13 requirements): closure groups, the entrance check, the "no suitable route" state, floor-aware steps, the phone layout, motion with reduced motion, and Requirement 13, which says how the ghost trail is drawn beside a way round. Each `tasks.md` links every task to requirement numbers.
 
-**Requirements-first spec** in [`.kiro/specs/ghost-routes/`](https://github.com/Crafter-Code/ghost-routes/tree/main/.kiro/specs/ghost-routes): `requirements.md` (9 requirements with acceptance criteria), `design.md` (graph, routing, UI states, properties), and `tasks.md` (each task linked to requirement numbers). Each visible behavior has its own criterion. Lift closure is Requirement 2, the ghost trail is Requirement 3, the verified proposal is Requirement 4, and the move to Room 104 is Requirement 5.
+**Kiro Crew (Claude Opus 5.5): first release.** From a 12-point brief the agent wrote the first spec, then the app: one hotel graph, one routing function, the lift outage, the ghost trail and the verified move to Room 104.
 
-**Tests named after the spec.** `src/routing/hotel.test.ts` has 16 unit tests whose names start with a requirement number, for example "3.2 ends at the closed lift door on Floor 1, before the lift leg". `src/routing/route.property.test.ts` has 5 fast-check properties on random graphs (P1 to P5): active routes use only open transitions, Step-free never uses steps or stairs, closing a transition never makes an unreachable room reachable, the ghost trail is a prefix of the baseline that ends before the first closed transition, and the proposal is the first reachable candidate. `npm test` runs all 21; all pass, and fast-check has found no counterexample.
+**Kiro CLI: the expansion.** In Kiro CLI the expansion went spec first, then in stages, each a separate commit: the three-floor graph and scenarios, the map and floor switcher, then the phone layout and motion. The first release's tests (`src/routing/hotel.test.ts`, 16 tests) were never edited and still pass.
 
-**Steering** in [`.kiro/steering/`](https://github.com/Crafter-Code/ghost-routes/tree/main/.kiro/steering). `routing-rules.md` (always on) holds the three routing rules: Step-free excludes stairs, steps and closed transitions; the map and the directions use one route result; the ghost trail ends before the first closed transition. `routing-code.md` loads when an agent touches routing, map or component files, and says where each rule lives in code. Kiro Crew loaded the rules into its session, and in the hook test the Kiro CLI agent quoted them without being asked.
+**Tests named after the specs.** `npm test` runs 129 tests, all passing:
 
-**Agent hook.** `.kiro/hooks/routing-tests-on-save.json` runs `npm run test:routing` after an agent saves a file in `src/routing/`. In Kiro CLI 3.3.0 the hook loaded and fired when the agent wrote a probe file there; the captured run (21 tests passed, exit code 0) is saved in `docs/evidence/hook-routing-tests-2026-11-15.log`. The probe file and a temporary logging hook were removed afterwards.
+- `src/routing/hotel.test.ts` (16): the first release, named by requirement, for example "3.2 ends at the closed lift door on Floor 1, before the lift leg".
+- `src/routing/expansion.test.ts` (97): the expansion, named `H<requirement>.<criterion>`, for example "H13.3 when the routes part at the closed door, a marker with a caption shows where it broke". It also runs every scenario with every combination of its closures and both profiles, and checks that the map and the text get the same route object.
+- `src/routing/route.property.test.ts` (7): fast-check properties on random graphs, P1 to P7. For example, closing a transition never makes an unreachable room reachable, and the dashed part of a ghost trail never contains a closed transition. No counterexample has been found.
+- `src/map/layout.test.ts` (9): every line drawn between graph nodes crosses walls only through the door gap of its own transition, so the route on the map really goes through the doors.
 
-**Playwright MCP in Kiro CLI.** `.kiro/settings/mcp.json` registers `@playwright/mcp` (Chrome, headless, isolated). Three earlier attempts failed with `Target crashed`. In the fourth attempt, Kiro CLI 3.3.0 drove Chrome through the MCP tools on the **local production build** (`npm run build`, then `vite preview` on `127.0.0.1:4173`) and passed all 8 checks of `docs/mcp-qa-prompt.md`: both routes to 204, lift out with the exact message, Steps allowed still open, the Room 203/104 proposal, the move with focus on the directions heading, copy, reset, a 390 px phone width with no sideways scroll, and a keyboard-only run. The four screenshots are in `docs/evidence/mcp/`. We never found why the earlier attempts crashed.
+**Steering.** [`routing-rules.md`](https://github.com/Crafter-Code/ghost-routes/blob/main/.kiro/steering/routing-rules.md) is always on and holds five rules, each naming its requirement and tests: Step-free excludes steps, stairs and closed transitions; the map and the directions use one route result; the ghost trail ends before the first closed transition; a closure group (the lift is two segments) closes and opens as one; an entrance is entered through its gate. [`routing-code.md`](https://github.com/Crafter-Code/ghost-routes/blob/main/.kiro/steering/routing-code.md) loads for routing, map and component files and says which test file belongs to which spec.
 
-**Playwright test runner (separate from MCP).** `npm run test:e2e` runs the same scenario on the production build at a desktop size and a phone size, and also checks the clipboard content. It passed against the local build (7 passed, 1 skipped, because the keyboard test runs on desktop only) and against the deployed demo at https://ghost-routes.pages.dev/ (7 passed, 1 skipped).
+**Agent hook.** `.kiro/hooks/routing-tests-on-save.json` runs `npm run test:routing` after an agent saves a file in `src/routing/`. In Kiro CLI 3.3.0 the hook loaded and fired; the captured run is saved in `docs/evidence/hook-routing-tests-2026-11-15.log`.
 
-**What the checks do not cover.** The MCP run used the local build, not the public demo. No real phone has been tested; the phone checks use an emulated 390 px viewport and a Pixel 7 profile.
+**Playwright MCP in Kiro CLI.** `.kiro/settings/mcp.json` registers `@playwright/mcp` (Chrome, headless, isolated). On the local production build, Kiro CLI drove Chrome through the MCP tools: the 8 checks of the first release, then the expansion's two main outcomes. For the gallery detour it read the status in the same frame as the click, saw the detour animation running from the point where the routes part, and saw it not replay when switching floors. For the lift outage it saw the old route fade into dashes, the move to Room 104 with focus on the new directions, and the lit door. Screenshots are in `docs/evidence/mcp/`.
+
+**Playwright test runner, on the deployed site.** `npm run test:e2e` runs 21 browser checks on a desktop and a phone viewport: the three scenarios, copy (the clipboard content is read back), reset, the move to Room 302 and a step that opens Floor 3, both "no suitable route" states, the keyboard, animations that run once and do not replay, reduced motion, and at 390 px the order of blocks, the focus order and no sideways scroll. The expansion was first published as a Cloudflare Pages preview of its branch and checked there (21 passed, 15 skipped by viewport); after approval it was merged and the same checks passed on https://ghost-routes.pages.dev/ (21 passed, 15 skipped). The production build serves the same JavaScript and CSS, byte for byte, as the reviewed preview.
+
+**What the checks do not cover.** The MCP runs used the local build. No real phone check is recorded; the phone checks use an emulated 390 px viewport and a Pixel 7 profile.
 
 ## Built with
 

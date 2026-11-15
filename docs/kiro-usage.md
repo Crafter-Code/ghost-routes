@@ -163,3 +163,11 @@ All work below ran in **Kiro CLI**, on the local production build (`npm run buil
 - **Checked only locally before:** the Playwright MCP runs in Kiro CLI (`docs/evidence/mcp/mcp-1` to `mcp-7`); the unit and property tests (they test source, not a deployment).
 - **Not covered:** no real phone.
 - **Correction:** the first preview run showed that the evidence screenshots were taken before the detour started drawing (0.45 s delay), so the large map showed only the shared part of the route. The tests themselves were right; the screenshots were not the final state. The screenshot helper now waits until no animation is running, and the screenshots in `docs/evidence/expansion/` were taken again. The checks were then repeated on the preview of that commit.
+
+### 2026-11-15 · Release to production (task 11.3)
+
+- **Approval:** the owner approved the preview of `fd88290`. The phone check line in the approval message was left as a template, so no real phone result is recorded.
+- **Merge:** `feature/haunted-hotel-expansion` pointed at `fd88290` locally and on GitHub. `main` (`f13ebe1`) was its ancestor, so `main` was fast-forwarded to `fd88290` (no merge commit) and pushed. Production therefore builds exactly the commit that was checked on the preview.
+- **Deploy:** the Cloudflare Pages check on `fd88290` reported "Deploy successful" for the production deployment `https://55ae959b.ghost-routes.pages.dev`. `https://ghost-routes.pages.dev/` answers 200 without a login and serves `assets/index-BEdMcauJ.js` and `assets/index-DSjhAF7P.css`, byte-for-byte the files of the local build and of the reviewed preview (SHA-256 compared).
+- **Checks on production** (`BASE_URL=https://ghost-routes.pages.dev npx playwright test`, Google Chrome, no login): 21 passed, 15 skipped. The skipped ones are desktop-only tests in the phone project, phone-only tests in the desktop project, and the recording in the phone project. These are the same 21 checks that passed on the preview.
+- **Docs after the release:** the Devpost draft and the video script were rewritten for three floors in a docs-only commit on `main`; its production deploy was checked the same way (below in the commit history and the final report).

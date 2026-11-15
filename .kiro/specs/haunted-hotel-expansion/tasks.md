@@ -134,12 +134,13 @@ Test names start with `H<requirement>.<criterion>`, for example `H4.3 ghost trai
     - e2e: the order of boxes, the focus order, the move options below the map, no sideways scroll in every state.
     - _Requirements: 9.6, 9.7_
 
-- [ ] 11. Docs and release
+- [x] 11. Docs and release
   - [x] 11.1 Update the steering files for closure groups and entrance gates, `README.md` for the three scenarios, and `docs/kiro-usage.md` with the client, the build and the results.
     - Done: `routing-rules.md` rules 4 and 5 and the drawing note in rule 3; `routing-code.md`; `README.md`; `docs/kiro-usage.md`.
     - _Requirements: 12.4_
   - [x] 11.2 Open a preview build of the branch (not production) and check it without a login.
     - Done: Cloudflare Pages preview of `feature/haunted-hotel-expansion`; full Playwright suite against it without a login. See `docs/kiro-usage.md`, "Preview on Cloudflare Pages".
     - _Requirements: 12.1, 12.2_
-  - [ ] 11.3 Ask for approval. Merge to `main` only after a yes.
+  - [x] 11.3 Ask for approval. Merge to `main` only after a yes.
+    - Done: preview of `fd88290` approved; `main` fast-forwarded to `fd88290` and pushed; production deploy checked (see `docs/kiro-usage.md`, "Release to production").
     - _Requirements: 12.1_

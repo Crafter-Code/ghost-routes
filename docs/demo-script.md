@@ -1,79 +1,86 @@
-# Demo video script: Ghost Routes (about 2 min 30 s)
+# Demo video script: Ghost Routes (about 2 min 35 s)
 
-Record at 1366×900 in a clean browser window at https://ghost-routes.pages.dev/. Open the page fresh (or press Reset) before recording. For the Kiro segment, have two editor tabs ready: `.kiro/specs/ghost-routes/requirements.md` scrolled to Requirement 3, and `src/routing/hotel.test.ts` scrolled to the test named "3.2". Speak at about 150 words per minute. Upload as a public YouTube video, then replace `[YOUTUBE URL]` in `docs/devpost-draft.md`.
+Record at 1366×900 in a clean browser window at https://ghost-routes.pages.dev/. Open the page fresh (or press **Reset scenario**) before recording. Do not turn on reduced motion in the operating system: the video shows the animations. For the Kiro segment, have two editor tabs ready: `.kiro/specs/haunted-hotel-expansion/requirements.md` scrolled to Requirement 13, and `src/routing/expansion.test.ts` scrolled to the test named "H13.3". Speak at about 150 words per minute. Upload as a public YouTube video, then replace `[YOUTUBE URL]` in `docs/devpost-draft.md` (two places).
+
+The video shows two different outcomes: a way round to the **same** room (Room 206), and a **move** to another room (204 → 104).
 
 ## Timing
 
-Each window includes the clicks and pauses listed under it, not just the narration.
+Each window includes the clicks and the silent holds, not just the narration.
 
-| Window | Segment | Words | Narration | Clicks and pauses | Total |
+| Window | Segment | Words | Narration | Clicks and silent holds | Total |
 |---|---|---|---|---|---|
-| 0:00–0:13 | Intro | 29 | 12 s | 1 s | 13 s |
-| 0:13–0:34 | Two routes to Room 204 | 37 | 15 s | 6 s | 21 s |
-| 0:34–0:58 | Lift out of service | 37 | 15 s | 9 s | 24 s |
-| 0:58–1:20 | Ghost trail | 41 | 16 s | 6 s silent hold | 22 s |
-| 1:20–1:42 | Move to Room 104 | 40 | 16 s | 6 s | 22 s |
-| 1:42–1:53 | Copy directions and reset | 14 | 6 s | 5 s | 11 s |
-| 1:53–2:20 | Kiro: requirement and test | 48 | 19 s | 8 s | 27 s |
-| 2:20–2:31 | Close | 26 | 10 s | 1 s | 11 s |
+| 0:00–0:12 | Intro | 28 | 11 s | 1 s | 12 s |
+| 0:12–0:22 | Three floors | 20 | 8 s | 2 s | 10 s |
+| 0:22–0:56 | Outcome 1: way round to Room 206 | 53 | 21 s | 14 s (6 s silent while the detour draws) | 34 s |
+| 0:56–1:44 | Outcome 2: lift out, move 204 → 104 | 73 | 29 s | 19 s (5 s silent on the ghost trail, 4 s silent on the lit door) | 48 s |
+| 1:44–1:54 | Copy and reset | 13 | 5 s | 4 s | 10 s |
+| 1:54–2:22 | Kiro: requirement and test | 54 | 22 s | 6 s | 28 s |
+| 2:22–2:34 | Close | 23 | 9 s | 2 s | 12 s |
 
-Target length 2:31 (272 words at 150 words per minute, plus 42 s of clicks and pauses). A slower reading at 130 words per minute adds about 15 s, so the video stays under 3:00.
+Target length 2:34: 264 words at 150 words per minute (106 s) plus 48 s of clicks and holds. Reading at 130 words per minute adds about 16 s, so the video stays under 3:00. If a take runs long, cut the "Three floors" segment first.
 
-## 0:00–0:13 · Intro
+Animation timings in the app, for the holds: the old route fades into dashes in 0.5 s; the way round starts drawing 0.45 s after the click and takes 0.9 s, then a soft halo appears at about 1.6 s; the new room's door pulses twice in 3.2 s and keeps a ring.
 
-**On screen:** the full page at the start state: title "Ghost Routes", The Hollowmere Hotel, both floor plans, Step-free selected with a solid route. Cursor still.
+## 0:00–0:12 · Intro
 
-**Voice:** "A workshop is booked in Room 204. The crew has a cart, so they need a route without steps. Ghost Routes shows what happens when the lift goes out."
+**On screen:** the start state: "Ghost Routes", the scenario picker on the left with **Lift out, move to Room 104** selected, the floor switcher and Floor 1 in the middle, the directions on the right. Cursor still.
 
-## 0:13–0:34 · Two routes to Room 204
+**Voice:** "A crew with heavy equipment on a cart needs a route without steps. Ghost Routes shows what happens to that route when a door or the lift closes."
 
-**On screen:** the "Routes to Room 204" panel. Click *Steps allowed* (at about 0:17): both plans show the route through the front steps and the Grand Staircase, and the summary reads "Main Entrance (front steps) → Grand Staircase · 2 min 05 s". Click *Step-free* (at about 0:26): the route moves to the side ramp and the lift, "Side Entrance (ramp) → Lift · 2 min 20 s". Directions list visible at the right.
+## 0:12–0:22 · Three floors
 
-**Voice:** "Two routes to Room 204. Steps allowed uses the front steps and the Grand Staircase. Step-free goes up the side ramp and takes the lift. Both come from one graph, and the written directions match the map."
+**On screen:** move the cursor over the three floor tabs above the map. Click **Floor 3** (about 0:16): the Library and the Moonlight Hall. Click **Floor 1** again (about 0:20).
 
-## 0:34–0:58 · Lift out of service
+**Voice:** "The Hollowmere Hotel has three floors. The small plans show every floor; the large one shows the floor you pick."
 
-**On screen:** *Step-free* selected. Click **Lift out of service** (at about 0:37): the toggle turns on, the status box turns red and reads "No step-free route to Room 204. The lift is out of service." Lock icons appear on the lift on both floors. Hold 2 s on the status. At about 0:47 click *Steps allowed*: the status says the route is still open via the Grand Staircase. At about 0:54 click *Step-free* again.
+## 0:22–0:56 · Outcome 1: a way round to the same room
 
-**Voice:** "Now I mark the lift out of service. For step-free, the answer is exact: no route, because the lift is out of service. Guests on foot can still use the Grand Staircase. The problem is the cart."
+**On screen:** click **Gallery door closed** (about 0:23). The map opens Floor 2; the Portrait Gallery, Room 206, is the event room. At about 0:30 click **Close central door**. Hold the cursor still and say nothing from 0:31 to 0:37: the amber route draws in from the central corridor along the west passage and the Gallery Walk to the gallery's south door, and a soft halo follows. The central door shows a lock and **Door closed**, with a small ghost. Then point at the status: "…still open via Side Entrance (ramp) → Lift → Gallery Walk. It adds 1 min 11 s."
 
-## 0:58–1:20 · Ghost trail
+**Voice (0:23–0:30):** "First, an exhibition in the Portrait Gallery on Floor 2. I close its central door."
 
-**On screen:** Floor 1 plan, framed so the whole plan is visible, with the legend and the line "Ghost trail: the usual step-free route now stops at the lift door on Floor 1." in view. The dashed trail runs from "Start" across the forecourt, up the side ramp and into the corridor, and stops at the lift door, where the lock and ghost are. From 0:58 to 1:07 the cursor traces the dashed line from Start to the lift door while the first line of narration runs. From 1:07 to 1:13 the cursor rests on the lift door and nothing moves: the dashed trail is on screen with no narration. From 1:13 to 1:20 the second line of narration runs.
+**Silent hold (0:31–0:37).**
 
-**Voice (0:58–1:07):** "This dashed line is the ghost trail: the route the crew used to have. It ends at the lift door on Floor 1."
+**Voice (0:38–0:56):** "The way round draws itself from the point where it leaves the old route: along the Gallery Walk to the other door. Same room, one minute eleven longer. The closed door is marked, so the crew knows why."
 
-**Silent hold (1:07–1:13):** no voice. Keep the cursor still on the door.
+## 0:56–1:44 · Outcome 2: the lift fails, the event moves from 204 to 104
 
-**Voice (1:13–1:20):** "The live route is solid, the old one is dashed. That is why the workshop has to move."
+**On screen:** click **Lift out, move to Room 104** (about 0:57). The map opens Floor 1. At about 1:02 click **Lift out of service**. The status turns red: "No step-free route to Room 204. The lift is out of service." On Floor 1 the old amber route fades into a dashed lilac trail that stops at the lift door, with a lock, a ghost and the caption **Lift out of service**. Hold still and silent from 1:04 to 1:09 on the dashed trail. Then scroll the left column to **Move the event?**: "✕ Room 203 (Blue Room): no step-free route", "✓ Room 104 (Garden Hall): step-free route, 1 min 00 s". At about 1:30 click **Move event to Room 104**. The map shows a solid route to Room 104 and its door pulses warm twice; focus moves to "Directions to Room 104". Hold still and silent from 1:31 to 1:35 on the lit door.
 
-## 1:20–1:42 · Move to Room 104
+**Voice (0:57–1:03):** "Second, a workshop in Room 204. Now the lift fails."
 
-**On screen:** the "Move the event?" box: "✕ Room 203 (Blue Room): no step-free route" and "✓ Room 104 (Garden Hall): step-free route, 1 min 00 s". Click **Move event to Room 104** (at about 1:30). The map redraws with a solid route to Room 104, the heading "Directions to Room 104" shows a focus outline, and the status reads "Event moved to Room 104. Step-free route ready via Side Entrance (ramp)."
+**Silent hold (1:04–1:09).**
 
-**Voice:** "The app does not guess a new room. It checks. Room 203 fails. Room 104 has a route without steps, so that is the one it offers. I press move, and the map shows a solid route to Room 104."
+**Voice (1:10–1:30):** "There is no way round this time. The dashed line is the ghost trail: the route the crew used to have, up to the lift door where it breaks. The app does not guess a new room. It checks. Room 203 fails. Room 104 has a route without steps."
 
-## 1:42–1:53 · Copy directions and reset
+**Silent hold (1:31–1:35).**
 
-**On screen:** click **Copy guest directions** (at about 1:43): the line "Copied: entrance, floor and steps." appears under the button. Hold 2 s. Click **Reset scenario** (at about 1:49): the page returns to Room 204 with Step-free selected and the lift toggle off.
+**Voice (1:36–1:44):** "I move the event. The new door lights up, and the directions are ready."
 
-**Voice:** "Copy guest directions gives the entrance, the floor and numbered steps. Reset starts again."
+## 1:44–1:54 · Copy and reset
 
-## 1:53–2:20 · Kiro: one requirement and the test that checks it
+**On screen:** click **Copy guest directions** (about 1:45): "Copied: entrance, floor and steps." appears under the button. Click **Reset scenario** (about 1:51): back to Room 204, nothing closed, Floor 1.
 
-**On screen:** switch to the editor (at about 1:53). First `.kiro/specs/ghost-routes/requirements.md` at Requirement 3, with criterion 3.2 highlighted: "The ghost trail SHALL end at the node just before the first closed transition of the baseline route. For the lift outage this is the closed lift door on Floor 1." Hold about 8 s. Switch to `src/routing/hotel.test.ts` at the test `3.2 ends at the closed lift door on Floor 1, before the lift leg`, highlighted. Hold about 8 s.
+**Voice:** "Copy gives guests the entrance, the floor and the steps. Reset starts again."
 
-**Voice:** "I built this with Kiro. Kiro Crew wrote the spec first. Requirement 3.2 says the ghost trail ends at the closed lift door on Floor 1. Here is the unit test with the same number in its name. A fast-check property tests the same rule on random graphs."
+## 1:54–2:22 · Kiro: one requirement and the test that checks it
 
-## 2:20–2:31 · Close
+**On screen:** switch to the editor (about 1:54). `.kiro/specs/haunted-hotel-expansion/requirements.md` at Requirement 13, criterion 3 highlighted: "WHEN the divergence point is the node before the first closed transition … THE drawn ghost trail SHALL be empty, and THE SYSTEM SHALL show the failure marker there with its caption, for example "Door closed"." Hold about 9 s. Switch to `src/routing/expansion.test.ts` at the test `H13.3 when the routes part at the closed door, a marker with a caption shows where it broke`. Hold about 9 s. Optionally cut to the terminal with `npm test` showing "129 passed".
 
-**On screen:** end card with https://ghost-routes.pages.dev/ and https://github.com/Crafter-Code/ghost-routes on a plain background. The start state of the app can show behind it.
+**Voice:** "I built this with Kiro, spec first. This requirement says what the map shows when the new route turns away right at the closed door: no dashes, just the marker. Here is the test with the same number. Steering keeps the routing rules in every agent's context, and a hundred and twenty-nine tests pass."
 
-**Voice:** "Ghost Routes: a route that fails should show where it failed. Try it at ghost-routes dot pages dot dev. The code is on GitHub, MIT license."
+## 2:22–2:34 · Close
+
+**On screen:** back to the app at the start state, then an end card with https://ghost-routes.pages.dev/ and https://github.com/Crafter-Code/ghost-routes.
+
+**Voice:** "Ghost Routes: a route that fails should show where it failed, and the way round. Try it at ghost-routes dot pages dot dev."
 
 ## Recording checks
 
-- The status text, the ghost trail end at the lift door, and the "Copied" line must be readable at 1080p. Zoom the browser to 110% if not.
+- The status text, the "Door closed" and "Lift out of service" captions, the dashed trail and the "Copied" line must be readable at 1080p. Zoom the browser to 110% if not.
+- Do not talk over the three silent holds: they are there so the detour drawing, the ghost trail and the lit door are seen.
+- If a click lands too early, press **Reset scenario** and redo the segment; the animations run once per change and do not replay when you switch floors.
 - Do not show a clipboard paste: the copy confirmation is on screen, and the clipboard content is covered by the Playwright test.
-- Only use the Kiro lines that are true today: Kiro Crew wrote the spec and the first version; Kiro CLI ran the hook and the Playwright MCP check. Do not mention Kiro IDE, custom agents or Kiro Web.
-- Time the finished video. If it runs over 3:00, cut the Steps allowed click in the lift segment first.
+- Only use Kiro lines that are true today (see `docs/kiro-usage.md`). Do not mention Kiro IDE, custom agents or Kiro Web.
+- Time the finished video. It must be under 3:00.
