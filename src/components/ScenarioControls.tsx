@@ -1,8 +1,9 @@
 import { routeSummary } from '../routing/directions'
 import { formatTime } from '../routing/format'
-import { HOTEL, LIFT_EDGE } from '../routing/hotel'
+import { HOTEL, LIFT_EDGES } from '../routing/hotel'
 import { PROFILE_LABELS, PROFILES, type ScenarioPlan } from '../routing/plan'
 import type { ScenarioAction } from '../routing/scenario'
+import { SCENARIOS } from '../routing/scenarios'
 import type { Profile } from '../routing/types'
 
 const PROFILE_HINTS: Record<Profile, string> = {
@@ -42,57 +43,102 @@ export function RouteComparison({ plan, dispatch }: { plan: ScenarioPlan; dispat
   )
 }
 
+/** The closure controls of the current scenario, and Reset. */
 export function ScenarioButtons({ plan, dispatch }: { plan: ScenarioPlan; dispatch: (a: ScenarioAction) => void }) {
-  const liftOut = plan.closed.has(LIFT_EDGE)
+  const controls = SCENARIOS[plan.state.scenario].controls
   return (
-    <div className="card actions">
-      <button
-        type="button"
-        className={`toggle${liftOut ? ' is-on' : ''}`}
-        aria-pressed={liftOut}
-        onClick={() => dispatch({ type: 'toggle-lift' })}
-      >
-        <span className="toggle__track" aria-hidden="true">
-          <span className="toggle__thumb" />
-        </span>
-        Lift out of service
-      </button>
-      <button type="button" className="button button--quiet" onClick={() => dispatch({ type: 'reset' })}>
-        Reset scenario
-      </button>
-    </div>
+    <section className="card actions" aria-labelledby="actions-title">
+      <h2 id="actions-title" className="card__title">
+        Organizer action
+      </h2>
+      <div className="actions__buttons">
+        {controls.map((control) => {
+          const on = control.edges.every((id) => plan.closed.has(id))
+          return (
+            <button
+              key={control.id}
+              type="button"
+              className={`toggle${on ? ' is-on' : ''}`}
+              aria-pressed={on}
+              onClick={() => dispatch({ type: 'toggle-closure', id: control.id })}
+            >
+              <span className="toggle__track" aria-hidden="true">
+                <span className="toggle__thumb" />
+              </span>
+              {control.label}
+            </button>
+          )
+        })}
+        <button type="button" className="button button--quiet" onClick={() => dispatch({ type: 'reset' })}>
+          Reset scenario
+        </button>
+      </div>
+    </section>
   )
 }
 
-export function StatusPanel({
-  plan,
-  onConfirm,
-}: {
-  plan: ScenarioPlan
-  onConfirm: (room: string) => void
-}) {
-  const showCandidates = !plan.route.found && plan.state.profile === 'step-free'
+function placeWithFloor(nodeId: string): string {
+  const node = HOTEL.nodes[nodeId]
+  return node.phrase.includes('Floor') ? node.phrase : `${node.phrase} on Floor ${node.floor}`
+}
+
+function ghostNote(plan: ScenarioPlan): string | null {
+  if (!plan.ghost || !plan.failure) return null
+  const kind = plan.state.profile === 'step-free' ? 'step-free ' : ''
+  if (plan.ghostDrawn && plan.ghostDrawn.legs.length > 0) {
+    return `Ghost trail: the usual ${kind}route now stops at ${HOTEL.nodes[plan.ghost.endsAt].phrase}.`
+  }
+  // The new route turns away right at the closed door: nothing is dashed, the marker shows the break.
+  return `${plan.failure.label} at ${placeWithFloor(plan.failure.at)}. The solid line takes the way round.`
+}
+
+function checkedAgainst(plan: ScenarioPlan): string {
+  const rules = plan.state.profile === 'step-free' ? 'step-free' : 'steps-allowed'
+  const liftOnly = [...plan.closed].every((id) => LIFT_EDGES.includes(id))
+  const liftClosed = [...plan.closed].some((id) => LIFT_EDGES.includes(id))
+  const what = liftOnly ? 'the lift out' : liftClosed ? 'the closed doors and the lift out' : 'the closed doors'
+  return `Checked with the same ${rules} rules and ${what}:`
+}
+
+export function StatusPanel({ plan, onConfirm }: { plan: ScenarioPlan; onConfirm: (room: string) => void }) {
+  const note = ghostNote(plan)
+  const stepFree = plan.state.profile === 'step-free'
+  const showEntrances = plan.entranceChecks.some((check) => plan.closed.has(check.gate))
   return (
     <section className="card status-card" aria-label="Route status">
       <p role="status" aria-live="polite" aria-atomic="true" className={`status status--${plan.status.tone}`} data-testid="status">
         {plan.status.text}
       </p>
-      {plan.ghost && (
-        <p className="ghost-note">
-          <span className="ghost-note__swatch" aria-hidden="true" /> Ghost trail: the usual {plan.state.profile === 'step-free' ? 'step-free ' : ''}
-          route now stops at {HOTEL.nodes[plan.ghost.endsAt].phrase}.
+      {note && (
+        <p className="ghost-note" data-testid="ghost-note">
+          <span className={`ghost-note__swatch${plan.ghostDrawn?.legs.length ? '' : ' ghost-note__swatch--lock'}`} aria-hidden="true" />
+          {note}
         </p>
       )}
-      {showCandidates && (
+      {showEntrances && (
+        <div className="checks" data-testid="entrance-checks">
+          <h2 className="checks__title">Entrances checked</h2>
+          <ul className="checks__list">
+            {plan.entranceChecks.map((check) => (
+              <li key={check.entrance} className={check.route.found ? 'is-ok' : 'is-rejected'}>
+                <span aria-hidden="true">{check.route.found ? '✓' : '✕'}</span> {HOTEL.nodes[check.entrance].label}:{' '}
+                {check.route.found ? `${stepFree ? 'step-free ' : ''}route, ${formatTime(check.route.cost)}` : check.reason}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {!plan.route.found && plan.candidates.length > 0 && (
         <div className="proposal" data-testid="proposal">
           <h2 className="proposal__title">Move the event?</h2>
-          <p className="proposal__lead">Checked with the same step-free rules and the lift out:</p>
+          <p className="proposal__lead">{checkedAgainst(plan)}</p>
           <ul className="proposal__list">
             {plan.candidates.map((check) => (
               <li key={check.room} className={check.route.found ? 'is-ok' : 'is-rejected'}>
-                <span aria-hidden="true">{check.route.found ? '✓' : '✕'}</span>{' '}
-                {HOTEL.nodes[check.room].phrase}:{' '}
-                {check.route.found ? `step-free route, ${formatTime(check.route.cost)}` : 'no step-free route'}
+                <span aria-hidden="true">{check.route.found ? '✓' : '✕'}</span> {HOTEL.nodes[check.room].phrase}:{' '}
+                {check.route.found
+                  ? `${stepFree ? 'step-free ' : ''}route, ${formatTime(check.route.cost)}`
+                  : `no ${stepFree ? 'step-free ' : ''}route`}
               </li>
             ))}
           </ul>
@@ -101,9 +147,16 @@ export function StatusPanel({
               Move event to {HOTEL.nodes[plan.proposal.room].label}
             </button>
           ) : (
-            <p className="proposal__none">No step-free alternative found.</p>
+            <p className="proposal__none" data-testid="no-suitable-route">
+              {plan.noAlternativeText}
+            </p>
           )}
         </div>
+      )}
+      {plan.otherProfileHint && (
+        <p className="other-profile" data-testid="other-profile">
+          {plan.otherProfileHint}
+        </p>
       )}
     </section>
   )

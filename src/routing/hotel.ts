@@ -2,7 +2,9 @@ import type { FloorId, Graph, GraphEdge, GraphNode, NodeKind } from './types'
 
 /**
  * The Hollowmere Hotel: a fictional three-floor hotel.
- * Floors 1 and 2 coordinates match src/map/layout.ts until the map is redrawn for the expansion.
+ * Node coordinates are positions in each floor's SVG viewBox (src/map/layout.ts). Every walking edge
+ * runs along a corridor or straight through a door gap, so the drawn route follows the plan.
+ * Costs do not depend on coordinates.
  */
 
 export const START = 'forecourt'
@@ -42,50 +44,50 @@ function room(id: string, number: string, name: string, floor: FloorId, x: numbe
 
 const nodes: GraphNode[] = [
   // Floor 1, outdoors
-  node('forecourt', 'Hotel forecourt', 1, 420, 410, 'outdoor', { phrase: 'the hotel forecourt' }),
-  node('garden-entrance', 'Garden Entrance', 1, 445, 340, 'entrance', { phrase: 'the Garden Entrance' }),
-  node('garden-vestibule', 'Garden vestibule', 1, 445, 280, 'corridor', { phrase: 'the garden vestibule', landmark: true }),
+  node('forecourt', 'Hotel forecourt', 1, 390, 410, 'outdoor', { phrase: 'the hotel forecourt' }),
+  node('garden-entrance', 'Garden Entrance', 1, 455, 348, 'entrance', { phrase: 'the Garden Entrance' }),
+  node('garden-vestibule', 'Garden vestibule', 1, 455, 248, 'corridor', { phrase: 'the garden vestibule', landmark: true }),
   node('ramp-base', 'Side ramp', 1, 660, 410, 'outdoor', { phrase: 'the foot of the side ramp' }),
   // Floor 1, entrances and corridors
-  node('main-entrance', 'Main Entrance', 1, 320, 345, 'entrance', { phrase: 'the Main Entrance' }),
+  node('main-entrance', 'Main Entrance', 1, 320, 348, 'entrance', { phrase: 'the Main Entrance' }),
   node('side-entrance', 'Side Entrance', 1, 660, 200, 'entrance', { phrase: 'the Side Entrance' }),
   node('lobby', 'Lobby', 1, 320, 280, 'corridor', { phrase: 'the lobby', landmark: true }),
   node('corridor-1-west', 'West corridor', 1, 120, 200, 'corridor', { phrase: 'the west corridor' }),
   node('corridor-1-mid', 'Central corridor', 1, 320, 200, 'corridor', { phrase: 'the central corridor' }),
   node('corridor-1-east', 'East corridor', 1, 455, 200, 'corridor', { phrase: 'the east corridor' }),
   node('lift-lobby-1', 'Lift lobby', 1, 560, 200, 'corridor', { phrase: 'the lift lobby' }),
-  node('stairs-1', 'Grand Staircase', 1, 300, 120, 'stairs', { phrase: 'the foot of the Grand Staircase' }),
+  node('stairs-1', 'Grand Staircase', 1, 320, 130, 'stairs', { phrase: 'the foot of the Grand Staircase' }),
   node('lift-1', 'Lift, Floor 1', 1, 560, 140, 'lift', { phrase: 'the lift door on Floor 1' }),
-  room('room-101', '101', 'Ivy Room', 1, 120, 120),
-  room('room-102', '102', 'Office', 1, 455, 140),
-  room('room-103', '103', 'Cloakroom', 1, 120, 270),
-  room('room-104', '104', 'Garden Hall', 1, 560, 270),
+  room('room-101', '101', 'Ivy Room', 1, 120, 152),
+  room('room-102', '102', 'Office', 1, 455, 152),
+  room('room-103', '103', 'Cloakroom', 1, 120, 248),
+  room('room-104', '104', 'Garden Hall', 1, 560, 248),
   // Floor 2
-  node('stairs-2', 'Grand Staircase landing', 2, 300, 120, 'stairs', { phrase: 'the top of the Grand Staircase' }),
+  node('stairs-2', 'Grand Staircase landing', 2, 320, 130, 'stairs', { phrase: 'the top of the Grand Staircase' }),
   node('lift-2', 'Lift, Floor 2', 2, 560, 140, 'lift', { phrase: 'the lift door on Floor 2' }),
   node('corridor-2-west', 'West corridor', 2, 120, 200, 'corridor', { phrase: 'the west corridor' }),
   node('corridor-2-mid', 'Central corridor', 2, 320, 200, 'corridor', { phrase: 'the central corridor' }),
   node('corridor-2-east', 'East corridor', 2, 455, 200, 'corridor', { phrase: 'the east corridor' }),
   node('lift-lobby-2', 'Lift lobby', 2, 560, 200, 'corridor', { phrase: 'the lift lobby' }),
-  room('room-201', '201', 'Reading Room', 2, 120, 120),
-  room('room-202', '202', 'Linen Store', 2, 455, 140),
-  room('room-203', '203', 'Blue Room', 2, 120, 270),
-  room('room-204', '204', 'Gold Room', 2, 560, 270),
-  room('room-205', '205', 'Card Room', 2, 510, 410),
-  room('room-206', '206', 'Portrait Gallery', 2, 310, 270),
+  room('room-201', '201', 'Reading Room', 2, 120, 152),
+  room('room-202', '202', 'Linen Store', 2, 455, 152),
+  room('room-203', '203', 'Blue Room', 2, 120, 248),
+  room('room-204', '204', 'Gold Room', 2, 560, 248),
+  room('room-205', '205', 'Card Room', 2, 510, 408),
+  room('room-206', '206', 'Portrait Gallery', 2, 320, 280),
   node('west-end-2', 'West passage', 2, 35, 200, 'corridor', { phrase: 'the west passage' }),
   node('south-walk-west', 'Gallery Walk', 2, 35, 360, 'corridor', { phrase: 'the Gallery Walk' }),
   node('south-walk-mid', 'Gallery Walk', 2, 320, 360, 'corridor', { phrase: 'the Gallery Walk' }),
   node('south-walk-east', 'Gallery Walk', 2, 510, 360, 'corridor', { phrase: 'the Gallery Walk' }),
   // Floor 3
-  node('stairs-3', 'Grand Staircase landing', 3, 300, 120, 'stairs', { phrase: 'the top of the Grand Staircase' }),
+  node('stairs-3', 'Grand Staircase landing', 3, 320, 130, 'stairs', { phrase: 'the top of the Grand Staircase' }),
   node('lift-3', 'Lift, Floor 3', 3, 560, 140, 'lift', { phrase: 'the lift door on Floor 3' }),
   node('corridor-3-west', 'West corridor', 3, 120, 200, 'corridor', { phrase: 'the west corridor' }),
   node('corridor-3-mid', 'Central corridor', 3, 320, 200, 'corridor', { phrase: 'the central corridor' }),
   node('corridor-3-east', 'East corridor', 3, 455, 200, 'corridor', { phrase: 'the east corridor' }),
   node('lift-lobby-3', 'Lift lobby', 3, 560, 200, 'corridor', { phrase: 'the lift lobby' }),
-  room('room-301', '301', 'Library', 3, 160, 270),
-  room('room-302', '302', 'Moonlight Hall', 3, 460, 270),
+  room('room-301', '301', 'Library', 3, 120, 248),
+  room('room-302', '302', 'Moonlight Hall', 3, 455, 248),
 ]
 
 function edge(id: string, from: string, to: string, kind: GraphEdge['kind'], cost: number, extra: Partial<GraphEdge> = {}): GraphEdge {

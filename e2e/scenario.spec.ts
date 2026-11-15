@@ -2,6 +2,13 @@ import { expect, test, type Page } from '@playwright/test'
 
 const BLOCKED = 'No step-free route to Room 204. The lift is out of service.'
 
+/** The map draws one floor at a time; pick it in the floor switcher. */
+async function showFloor(page: Page, floor: number) {
+  const tab = page.getByRole('tab', { name: new RegExp(`^Floor ${floor}\\b`) })
+  await tab.click()
+  await expect(tab).toHaveAttribute('aria-selected', 'true')
+}
+
 async function open(page: Page) {
   await page.goto('/')
   await expect(page.getByRole('heading', { level: 1, name: 'Ghost Routes' })).toBeVisible()
@@ -15,7 +22,9 @@ test('scenario 204 -> lift out -> 104 on the built app', async ({ page, context 
   await expect(page.getByTestId('summary-steps-allowed')).toContainText('Main Entrance (front steps) → Grand Staircase')
   await expect(page.getByTestId('summary-step-free')).toContainText('Side Entrance (ramp) → Lift')
   await expect(page.getByRole('radio', { name: /Step-free/ })).toBeChecked()
+  await showFloor(page, 2)
   await expect(page.getByTestId('route-2')).toBeAttached()
+  await showFloor(page, 1)
   await expect(page.getByTestId('directions')).toContainText('Take the lift up to Floor 2.')
   await page.screenshot({ path: testInfo.outputPath('1-routes-to-204.png'), fullPage: true })
 
@@ -25,7 +34,9 @@ test('scenario 204 -> lift out -> 104 on the built app', async ({ page, context 
   await expect(lift).toHaveAttribute('aria-pressed', 'true')
   await expect(page.getByRole('status').first()).toHaveText(BLOCKED)
   await expect(page.getByTestId('lock-lift-1')).toBeVisible()
+  await showFloor(page, 2)
   await expect(page.getByTestId('lock-lift-2')).toBeVisible()
+  await showFloor(page, 1)
   await expect(page.getByTestId('summary-step-free')).toHaveText('No route')
 
   // Steps allowed still reaches Room 204 by the Grand Staircase.

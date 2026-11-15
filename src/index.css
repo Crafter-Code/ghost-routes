@@ -6,8 +6,14 @@
   --ink-soft: #5c4a42;
   --burgundy: #6b1d24;
   --burgundy-soft: #8e3a40;
-  --route: #0d6b6b;
-  --ghost: #6f6a8f;
+  /* Active route: amber line on a dark casing. --route-text is the amber for text on paper (6.5:1). */
+  --route: #f0a020;
+  --route-casing: #2a1a16;
+  --route-text: #8a4b00;
+  --route-tint: #fdf1d8;
+  /* Ghost trail: muted lilac. --ghost is for text (6.5:1 on paper); --ghost-line for the dashes (3.5:1 on cream, on a paper casing over carpet). */
+  --ghost: #5e5585;
+  --ghost-line: #8475b6;
   --warning: #8a5a00;
   --warning-bg: #fbefd2;
   --blocked: #8f1d1d;
@@ -16,6 +22,8 @@
   --carpet-base: #6a2f1f;
   --carpet-ring: #c46a2a;
   --carpet-core: #9b2f22;
+  --carpet-glow: #e8b04a;
+  --carpet-night: #3b2340;
   --focus: #1b5fd1;
   --radius: 14px;
 
@@ -48,7 +56,7 @@ textarea {
 }
 
 .page {
-  max-width: 1360px;
+  max-width: 1560px;
   margin: 0 auto;
   padding: 24px 20px 40px;
 }
@@ -78,27 +86,42 @@ textarea {
   max-width: 62ch;
   font-size: 1.08rem;
 }
-.masthead__steps {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 22px;
-  margin: 0;
-  padding-left: 1.2em;
-  color: var(--ink-soft);
-  font-size: 0.95rem;
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -60px;
+  z-index: 10;
+  background: var(--burgundy);
+  color: var(--paper);
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-weight: 700;
+  text-decoration: none;
 }
-.masthead__steps li {
-  padding-right: 4px;
+.skip-link:focus {
+  top: 10px;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
-/* Layout: controls and directions beside the maps on wide screens, around them on phones */
+/* Layout: one column on phones (map right after the status), two on tablets, three on desktops:
+   controls and status | the map | the guest steps. */
 .layout {
   display: grid;
   gap: 18px;
   grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
     'controls'
-    'maps'
+    'map'
     'directions';
 }
 .layout__controls {
@@ -107,23 +130,73 @@ textarea {
   gap: 14px;
   align-content: start;
 }
-.layout__maps {
-  grid-area: maps;
+.layout__map {
+  grid-area: map;
   display: grid;
-  gap: 14px;
+  gap: 12px;
   align-content: start;
+  min-width: 0;
+}
+.layout__map:focus {
+  outline: none;
 }
 .layout__directions {
   grid-area: directions;
+  min-width: 0;
 }
 
-@media (min-width: 960px) {
+@media (min-width: 760px) {
   .layout {
-    grid-template-columns: minmax(0, 1fr) 380px;
+    grid-template-columns: 300px minmax(0, 1fr);
     grid-template-areas:
-      'maps controls'
-      'maps directions';
+      'controls map'
+      'controls directions';
     grid-template-rows: auto 1fr;
+  }
+}
+
+@media (min-width: 1180px) {
+  .layout {
+    grid-template-columns: 310px minmax(0, 1fr) 320px;
+    grid-template-areas: 'controls map directions';
+    grid-template-rows: auto;
+  }
+  .layout__directions {
+    position: sticky;
+    top: 16px;
+    align-self: start;
+  }
+}
+
+@media (max-width: 759px) {
+  .page {
+    padding: 14px 12px 32px;
+  }
+  .masthead {
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+  }
+  .masthead__lead {
+    font-size: 0.98rem;
+  }
+  .picker__hint,
+  .profile-option__hint {
+    display: none;
+  }
+  .picker__option,
+  .profile-option {
+    padding: 6px 10px;
+    margin-top: 6px;
+  }
+  .card {
+    padding: 10px 12px;
+  }
+  .skip-link {
+    position: static;
+    display: inline-block;
+    margin-bottom: 8px;
+    padding: 6px 14px;
+    font-size: 0.92rem;
   }
 }
 
@@ -162,14 +235,14 @@ fieldset.card > legend + * {
   cursor: pointer;
 }
 .profile-option.is-selected {
-  border-color: var(--route);
-  background: #eef6f3;
+  border-color: var(--route-text);
+  background: var(--route-tint);
 }
 .profile-option input {
   margin-top: 5px;
   width: 18px;
   height: 18px;
-  accent-color: var(--route);
+  accent-color: var(--route-text);
 }
 .profile-option__body {
   display: grid;
@@ -183,7 +256,7 @@ fieldset.card > legend + * {
 }
 .profile-option__route {
   font-size: 0.92rem;
-  color: var(--route);
+  color: var(--route-text);
   font-weight: 600;
 }
 .profile-option__route.is-blocked {
@@ -191,12 +264,11 @@ fieldset.card > legend + * {
 }
 
 /* Buttons */
-.actions {
+.actions__buttons {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
-  justify-content: space-between;
 }
 .button,
 .toggle {
@@ -290,7 +362,76 @@ fieldset.card > legend + * {
 .ghost-note__swatch {
   flex: none;
   width: 28px;
-  border-top: 4px dashed var(--ghost);
+  border-top: 4px dashed var(--ghost-line);
+}
+.ghost-note__swatch--lock {
+  width: 14px;
+  height: 16px;
+  border: 0;
+  border-radius: 3px;
+  background: var(--blocked);
+}
+.checks {
+  margin-top: 12px;
+  border-top: 1px solid var(--cream-deep);
+  padding-top: 10px;
+}
+.checks__title {
+  margin: 0 0 4px;
+  font-size: 1rem;
+  color: var(--burgundy);
+}
+.checks__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 2px;
+}
+.checks__list .is-ok,
+.proposal__list .is-ok {
+  color: #0b4f45;
+  font-weight: 600;
+}
+.checks__list .is-rejected {
+  color: var(--blocked);
+}
+.other-profile {
+  margin: 10px 0 0;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+}
+
+/* Scenario picker */
+.picker__option {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 8px 10px;
+  margin-top: 6px;
+  border: 1.5px solid var(--cream-deep);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.picker__option.is-selected {
+  border-color: var(--burgundy);
+  background: #f7e9e4;
+}
+.picker__option input {
+  margin-top: 5px;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--burgundy);
+}
+.picker__body {
+  display: grid;
+}
+.picker__title {
+  font-weight: 700;
+}
+.picker__hint {
+  font-size: 0.86rem;
+  color: var(--ink-soft);
 }
 .proposal {
   margin-top: 12px;
@@ -333,11 +474,60 @@ fieldset.card > legend + * {
   color: var(--ink-soft);
   font-size: 0.92rem;
 }
+.directions__hint {
+  margin: 0 0 8px;
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+}
 .directions__steps {
+  list-style: none;
   margin: 0 0 14px;
-  padding-left: 1.4em;
+  padding: 0;
   display: grid;
   gap: 6px;
+}
+.step {
+  display: grid;
+  grid-template-columns: 26px 1fr auto;
+  gap: 8px;
+  align-items: start;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  text-align: left;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1.5px solid var(--cream-deep);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.step:hover {
+  border-color: var(--route-text);
+}
+.step.is-current {
+  border: 2px solid var(--route-text);
+  background: var(--route-tint);
+  box-shadow: inset 4px 0 0 var(--route);
+}
+.step__number {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--burgundy);
+  color: var(--paper);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.step__floor {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--route-text);
+  border: 1.5px solid currentColor;
+  border-radius: 999px;
+  padding: 0 6px;
+  margin-top: 2px;
 }
 .directions__copy-status {
   min-height: 1.5em;
@@ -358,19 +548,74 @@ fieldset.card > legend + * {
   outline-offset: 4px;
 }
 
+/* Floor switcher */
+.switcher {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.switcher__tab {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+  min-width: 0;
+  padding: 6px 6px 8px;
+  border: 2px solid var(--cream-deep);
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+.switcher__tab:hover {
+  border-color: var(--burgundy-soft);
+}
+.switcher__tab.is-selected {
+  border: 3px solid var(--burgundy);
+  background: #f7e9e4;
+  box-shadow: 0 3px 0 var(--burgundy);
+}
+.switcher__name {
+  font-weight: 700;
+  color: var(--burgundy);
+  font-size: 0.95rem;
+}
+.switcher__tab.is-selected .switcher__name {
+  background: var(--burgundy);
+  color: var(--paper);
+  border-radius: 999px;
+  padding: 0 8px;
+  justify-self: start;
+}
+.switcher__mini {
+  display: block;
+  background: var(--cream);
+  border-radius: 6px;
+}
+.switcher__words {
+  font-size: 0.78rem;
+  line-height: 1.25;
+  color: var(--ink-soft);
+}
+
 /* Floor plans */
 .floor {
   margin: 0;
   background: var(--cream);
-  border: 2px solid var(--burgundy);
+  border: 3px solid var(--burgundy);
   border-radius: var(--radius);
   padding: 10px 10px 4px;
 }
 .floor__title {
   font-weight: 700;
   color: var(--burgundy);
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   padding: 0 4px 4px;
+}
+.floor__words {
+  font-weight: 400;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
 }
 .floor__svg {
   display: block;
@@ -384,6 +629,12 @@ fieldset.card > legend + * {
   fill: var(--ink-soft);
   font-size: 13px;
   font-style: italic;
+}
+.gravel {
+  fill: none;
+  stroke: #cbbd9f;
+  stroke-width: 22;
+  stroke-linecap: round;
 }
 .front-step {
   stroke: var(--burgundy-soft);
@@ -402,33 +653,75 @@ fieldset.card > legend + * {
 .corridor {
   opacity: 0.55;
 }
-.room rect {
+.room rect,
+.room-mini {
   fill: var(--paper);
   stroke: var(--burgundy);
   stroke-width: 3;
 }
-.room--carpet rect {
+.room-mini {
+  stroke-width: 6;
+}
+.room--carpet > rect {
   opacity: 0.55;
 }
-.room--service rect {
+.room--service > rect,
+.room-mini--service {
   fill: var(--cream-deep);
 }
-.room--stairs rect {
+.room--stairs > rect,
+.room-mini--stairs {
   fill: #efe5d0;
 }
-.room--lift rect {
+.room--lift > rect,
+.room-mini--lift {
   fill: #e9e1ef;
 }
-.room--target rect {
+.room--library > rect,
+.room-mini--library {
+  fill: #f3e6cf;
+}
+.room--hall > rect,
+.room-mini--hall {
+  fill: #ebe6f5;
+}
+.room--gallery > rect,
+.room-mini--gallery {
+  fill: #f6ead9;
+}
+.room--target > rect,
+.room-mini--target {
   fill: #fff3c9;
   stroke-width: 5;
 }
-.room--moved-from rect {
+.room-mini--target {
+  stroke-width: 9;
+}
+.room--moved-from > rect {
   fill: #f2e8e8;
+}
+.room .shelf {
+  fill: #8a5a3c;
+  stroke: #5c3a24;
+  stroke-width: 1;
+}
+.hall-moon {
+  fill: #a898d4;
+  opacity: 0.7;
+}
+.room .portrait {
+  fill: #c9a24a;
+  stroke: var(--burgundy);
+  stroke-width: 1.5;
 }
 .stair-tread {
   stroke: var(--burgundy-soft);
   stroke-width: 2;
+}
+.stair-note {
+  fill: var(--burgundy);
+  font-size: 12px;
+  font-weight: 700;
 }
 .room-number {
   fill: var(--burgundy);
@@ -453,9 +746,15 @@ fieldset.card > legend + * {
   stroke: var(--cream);
   stroke-width: 9;
 }
+.floor__svg--compact .outer-wall {
+  stroke-width: 12;
+}
+.floor__svg--compact .door-gap {
+  stroke-width: 14;
+}
 .route-casing {
   fill: none;
-  stroke: var(--paper);
+  stroke: var(--route-casing);
   stroke-width: 13;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -467,14 +766,45 @@ fieldset.card > legend + * {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.ghost-trail {
+.route-highlight {
   fill: none;
-  stroke: var(--ghost);
-  stroke-width: 6;
-  stroke-dasharray: 3 11;
+  stroke: var(--burgundy);
+  stroke-width: 24;
   stroke-linecap: round;
   stroke-linejoin: round;
-  opacity: 0.9;
+  opacity: 0.35;
+}
+.step-ring {
+  fill: none;
+  stroke: var(--burgundy);
+  stroke-width: 5;
+}
+.ghost-trail-casing {
+  fill: none;
+  stroke: var(--paper);
+  stroke-width: 10;
+  stroke-dasharray: 10 8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ghost-trail {
+  fill: none;
+  stroke: var(--ghost-line);
+  stroke-width: 6;
+  stroke-dasharray: 10 8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.floor__svg--compact .route-casing {
+  stroke-width: 22;
+}
+.floor__svg--compact .route {
+  stroke-width: 13;
+}
+.floor__svg--compact .ghost-trail,
+.floor__svg--compact .ghost-trail-casing {
+  stroke-width: 12;
+  stroke-dasharray: 18 12;
 }
 .ghost-icon path {
   fill: #f4f2fb;
@@ -486,6 +816,8 @@ fieldset.card > legend + * {
 }
 .lock__badge {
   fill: var(--blocked);
+  stroke: var(--paper);
+  stroke-width: 2;
 }
 .lock__shackle {
   fill: none;
@@ -495,16 +827,32 @@ fieldset.card > legend + * {
 .lock__body {
   fill: var(--paper);
 }
-.lock__label {
+.floor__svg--compact .lock {
+  transform-box: fill-box;
+  transform-origin: center;
+  scale: 1.5;
+}
+.caption rect {
+  fill: var(--paper);
+  stroke: var(--blocked);
+  stroke-width: 1.5;
+}
+.caption text {
   fill: var(--blocked);
   font-size: 12px;
   font-weight: 700;
-  paint-order: stroke;
+}
+.caption--strong rect {
+  fill: var(--blocked);
   stroke: var(--paper);
-  stroke-width: 3px;
+}
+.caption--strong text {
+  fill: var(--paper);
 }
 .floor-change rect {
-  fill: var(--route);
+  fill: var(--route-text);
+  stroke: var(--paper);
+  stroke-width: 2;
 }
 .floor-change text {
   fill: var(--paper);
@@ -512,12 +860,12 @@ fieldset.card > legend + * {
   font-weight: 700;
 }
 .marker--start circle {
-  fill: var(--route);
-  stroke: var(--paper);
-  stroke-width: 3;
+  fill: var(--route-casing);
+  stroke: var(--route);
+  stroke-width: 4;
 }
 .marker--start text {
-  fill: var(--route);
+  fill: var(--ink);
   font-weight: 700;
   font-size: 14px;
 }
@@ -552,12 +900,20 @@ fieldset.card > legend + * {
   height: 12px;
 }
 .legend__swatch--route {
-  border-top: 6px solid var(--route);
-  height: 0;
+  height: 10px;
+  background: var(--route);
+  border: 2px solid var(--route-casing);
+  border-radius: 6px;
 }
 .legend__swatch--ghost {
-  border-top: 5px dashed var(--ghost);
+  border-top: 5px dashed var(--ghost-line);
   height: 0;
+}
+.legend__swatch--lock {
+  width: 14px;
+  height: 16px;
+  border-radius: 3px;
+  background: var(--blocked);
 }
 .legend__swatch--carpet {
   background: repeating-linear-gradient(60deg, var(--carpet-ring) 0 4px, var(--carpet-base) 4px 8px);

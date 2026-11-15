@@ -89,21 +89,23 @@ Test names start with `H<requirement>.<criterion>`, for example `H4.3 ghost trai
     - e2e `scenario.spec.ts` passes unchanged.
     - _Requirements: 2.1, 12.3_
 
-- [ ] 7. Floor plans
-  - [ ] 7.1 Add the three layouts to `src/map/layout.ts` with the rooms, doors, stairs and lift from the sketches, a per-floor viewBox (Floor 2 is taller) and door shapes with `edgeId`.
+- [x] 7. Floor plans
+  - [x] 7.1 Add the three layouts to `src/map/layout.ts` with the rooms, doors, stairs and lift from the sketches, a per-floor viewBox (Floor 2 is taller) and door shapes with `edgeId`.
     - _Requirements: 1.2, 1.3, 1.4, 1.5, 11.1_
-  - [ ] 7.2 In `FloorPlan.tsx`: three carpet patterns, locks at door shapes, a `compact` mode, highlighted step legs, `floor-N-mini` test ids. Draw `plan.ghostDrawn` (not `plan.ghost`) dashed, shared legs once as the solid route, and `plan.failure` as a lock with its caption.
+  - [x] 7.1b Align the node coordinates in `hotel.ts` with the drawings, and test it: `src/map/layout.test.ts` (every walking line crosses walls only through a door gap of its own edge; room and corridor nodes sit inside their shapes).
+    - _Requirements: 1.1, 8.1_
+  - [x] 7.2 In `FloorPlan.tsx`: three carpet patterns, locks at door shapes, a `compact` mode, highlighted step legs, `floor-N-mini` test ids. Draw `plan.ghostDrawn` (not `plan.ghost`) dashed, shared legs once as the solid route, and `plan.failure` as a lock with its caption.
     - _Requirements: 8.7, 8.8, 9.1, 11.2, 13.1, 13.3, 13.5_
-  - [ ] 7.3 Check the plans by eye against the sketches on desktop and at 390 px before building more UI. Record the result.
+  - [x] 7.3 Check the plans by eye against the sketches on desktop and at 390 px before building more UI. Record the result.
 
-- [ ] 8. Interface
-  - [ ] 8.1 `ScenarioPicker`, generic closure controls, entrance check list, no-suitable-route panel, proposal for either profile.
+- [x] 8. Interface
+  - [x] 8.1 `ScenarioPicker`, generic closure controls, entrance check list, no-suitable-route panel, proposal for either profile.
     - _Requirements: 3.1, 3.6, 6.8, 7.2, 7.3_
-  - [ ] 8.2 `FloorSwitcher` as a tab list with mini plans, chips and a separate polite live region.
+  - [x] 8.2 `FloorSwitcher` as a tab list with mini plans, chips and a separate polite live region.
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.8_
-  - [ ] 8.3 `Directions` as step buttons with `aria-current="step"`; `App` keeps `focusedFloor` and `selectedStep`; selecting a step switches the floor.
+  - [x] 8.3 `Directions` as step buttons with `aria-current="step"`; `App` keeps `focusedFloor` and `selectedStep`; selecting a step switches the floor.
     - _Requirements: 8.7, 9.4_
-  - [ ] 8.4 Desktop three-column layout and phone stack in `index.css`.
+  - [x] 8.4 Desktop three-column layout and phone stack in `index.css`.
     - _Requirements: 9.5, 9.6, 9.7_
 
 - [ ] 9. Motion and look
@@ -112,8 +114,8 @@ Test names start with `H<requirement>.<criterion>`, for example `H4.3 ghost trai
   - [ ] 9.2 Tokens `--glow`, `--glow-soft`, the lit door ring and glow, and a contrast check of the new text styles.
     - _Requirements: 10.7, 11.3, 11.4, 11.5_
 
-- [ ] 10. Browser checks
-  - [ ] 10.1 Edit `e2e/scenario.spec.ts` only to switch floors before checking Floor 2 items. Run it on desktop and phone. The original scenario 204 → lift out → ghost trail → 104 → copy → reset must pass.
+- [ ] 10. Browser checks (10.1 and 10.2 done except reduced motion, which waits for task 9)
+  - [x] 10.1 Edit `e2e/scenario.spec.ts` only to switch floors before checking Floor 2 items. Run it on desktop and phone. The original scenario 204 → lift out → ghost trail → 104 → copy → reset must pass.
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 12.3_
   - [ ] 10.2 Add `e2e/expansion.spec.ts`:
     - gallery: close the central door, check the detour text, the dashed ghost and the solid detour, then close the second door and confirm the proposal for Room 302;

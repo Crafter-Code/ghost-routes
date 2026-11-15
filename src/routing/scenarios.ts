@@ -1,4 +1,5 @@
 import { BOOKED_ROOM, LIFT_EDGES } from './hotel'
+import type { FloorId } from './types'
 import type { ScenarioState } from './plan'
 
 /** The three organizer scenarios. Each has an event room and the controls that close transitions. */
@@ -15,7 +16,11 @@ export interface ClosureControl {
 export interface ScenarioDef {
   id: ScenarioId
   title: string
+  /** One line for the scenario picker. */
+  hint: string
   bookedRoom: string
+  /** Floor the map opens on when the visitor picks this scenario. */
+  focusFloor: FloorId
   controls: readonly ClosureControl[]
 }
 
@@ -25,13 +30,17 @@ export const SCENARIOS: Readonly<Record<ScenarioId, ScenarioDef>> = {
   lift: {
     id: 'lift',
     title: 'Lift out, move to Room 104',
+    hint: 'Workshop in Room 204. The lift fails.',
     bookedRoom: BOOKED_ROOM,
+    focusFloor: 1,
     controls: [LIFT_CONTROL],
   },
   gallery: {
     id: 'gallery',
     title: 'Gallery door closed',
+    hint: 'Exhibition in the Portrait Gallery, Room 206. A door closes.',
     bookedRoom: 'room-206',
+    focusFloor: 2,
     controls: [
       { id: 'central-door', label: 'Close central door', edges: ['door-206-north'] },
       { id: 'walk-door', label: 'Close Gallery Walk door', edges: ['door-206-south'] },
@@ -41,7 +50,9 @@ export const SCENARIOS: Readonly<Record<ScenarioId, ScenarioDef>> = {
   entrance: {
     id: 'entrance',
     title: 'Side Entrance closed',
+    hint: 'Workshop in Room 204. The ramp door is locked.',
     bookedRoom: BOOKED_ROOM,
+    focusFloor: 1,
     controls: [
       { id: 'side-entrance', label: 'Close Side Entrance', edges: ['side-door'] },
       { id: 'garden-entrance', label: 'Close Garden Entrance', edges: ['garden-door'] },

@@ -275,7 +275,9 @@ The proposal panel appears whenever the route is missing, for either profile. It
 
 ## Layout
 
-### Desktop, 960 px and wider (sketch at 1366 × 900)
+### Desktop, 1180 px and wider (sketch at 1366 × 900)
+
+From 760 px to 1179 px the steps column moves under the map. Under 760 px everything stacks in one column, with a "Jump to the map" link at the top.
 
 ```
 +----------------------------------------------------------------------------------------+

@@ -147,7 +147,8 @@ Terms from the Ghost Routes spec (Graph, Transition, Profile, Route result, Base
 4. THE SYSTEM SHALL merge consecutive legs of one lift or one staircase into a single step, for example "Take the lift up to Floor 3."
 5. THE SYSTEM SHALL start a new step at every entrance, for example "Walk to the Garden Entrance. Level entrance, no steps."
 6. EACH step SHALL have a floor: the floor where its legs end.
-7. WHEN the visitor selects a step THE SYSTEM SHALL make that step's floor the focused floor, SHALL mark the step with `aria-current="step"`, and SHALL highlight that step's legs on the map.
+7. WHEN the visitor selects a step THE SYSTEM SHALL make that step's floor the focused floor, SHALL mark the step with `aria-current="step"`, SHALL keep keyboard focus on the step, and SHALL highlight that step's legs on the map (a ring at the lift or stair door for a floor change).
+9. AT every lift or staircase ride THE map SHALL show the floor the ride goes to ("↑ Floor 3") on the floor where it starts, and the floor it came from ("from Floor 1") on the floor where it ends.
 8. THE SYSTEM SHALL draw one active route and at most one drawn ghost trail at a time.
 
 ### Requirement 9: Floor switcher and layout
@@ -159,9 +160,9 @@ Terms from the Ghost Routes spec (Graph, Transition, Profile, Route result, Base
 1. THE SYSTEM SHALL show a floor switcher with three entries (Floor 1, Floor 2, Floor 3). EACH entry SHALL show a small plan with its route, ghost trail and locks, and SHALL say in text which of these the floor has.
 2. THE focused floor SHALL be drawn large under the switcher.
 3. THE switcher SHALL be a tab list: arrow keys move between floors, Home and End go to the first and last floor, and the selected floor has `aria-selected="true"`.
-4. WHEN the route, the ghost trail or a closure changes THE SYSTEM SHALL NOT change the focused floor unless the visitor selects a floor or a step.
-5. WHERE the viewport is at least 960 px wide THE SYSTEM SHALL show three columns: scenario, organizer action and block status on the left, the floor switcher and map in the middle, and the guest steps on the right.
-6. WHERE the viewport is under 960 px THE SYSTEM SHALL stack them in this order: scenario, route comparison, organizer action, block status, floor switcher, map, guest steps.
+4. WHEN the route, the ghost trail or a closure changes THE SYSTEM SHALL NOT change the focused floor. THE focused floor SHALL change only when the visitor selects a floor or a step, picks a scenario (its floor: 1 for the lift and the Side Entrance, 2 for the gallery), confirms a move (the new room's floor), or resets (Floor 1).
+5. WHERE the viewport is at least 1180 px wide THE SYSTEM SHALL show three columns: scenario, organizer action and block status on the left, the floor switcher and map in the middle (the widest column), and the guest steps on the right. From 760 px to 1179 px the guest steps move under the map.
+6. WHERE the viewport is under 760 px THE SYSTEM SHALL stack them in this order: scenario, route comparison, organizer action, block status, floor switcher, map, guest steps, and SHALL offer a "Jump to the map" link at the top of the page.
 7. AT 390 px width THE page SHALL NOT scroll sideways and the floor switcher SHALL fit in one row.
 8. WHEN the focused floor changes THE SYSTEM SHALL announce "Showing Floor <n>." in a polite live region that is separate from the route status.
 
@@ -187,6 +188,7 @@ Terms from the Ghost Routes spec (Graph, Transition, Profile, Route result, Base
 
 1. THE floor plans SHALL use a cream background, burgundy walls and large room numbers.
 2. EACH floor SHALL have its own original carpet pattern drawn in SVG: nested hexagons on Floor 1, lantern diamonds on Floor 2 and crescent moons on Floor 3.
+7. THE active route SHALL be amber on a dark casing, the ghost trail muted lilac and dashed, and every closure SHALL show a lock icon with a text caption.
 3. THE lit door of a moved event SHALL use a local warm glow and SHALL NOT dim or tint the rest of the plan.
 4. THE SYSTEM SHALL use no copyrighted artwork, fonts or images, and no external requests.
 5. TEXT SHALL meet a contrast ratio of at least 4.5 to 1, and every control SHALL keep a visible focus indicator.

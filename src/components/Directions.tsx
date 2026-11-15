@@ -1,15 +1,24 @@
 import { forwardRef, useState } from 'react'
-import { buildDirections, buildGuestText } from '../routing/directions'
+import { buildGuestText, type DirectionStep } from '../routing/directions'
 import { HOTEL } from '../routing/hotel'
 import { PROFILE_LABELS, type ScenarioPlan } from '../routing/plan'
 
 type CopyState = 'idle' | 'copied' | 'failed'
 
-export const Directions = forwardRef<HTMLHeadingElement, { plan: ScenarioPlan }>(function Directions({ plan }, headingRef) {
+interface DirectionsProps {
+  plan: ScenarioPlan
+  /** Built from plan.route in App, the same route the floor plans draw. */
+  steps: DirectionStep[]
+  selected: number | null
+  onSelect: (index: number) => void
+}
+
+export const Directions = forwardRef<HTMLHeadingElement, DirectionsProps>(function Directions(
+  { plan, steps, selected, onSelect },
+  headingRef,
+) {
   const [copy, setCopy] = useState<{ state: CopyState; text: string }>({ state: 'idle', text: '' })
   const target = HOTEL.nodes[plan.target]
-  // Same route object the floor plans draw.
-  const steps = buildDirections(HOTEL, plan.route)
   const guestText = buildGuestText(HOTEL, plan.route, PROFILE_LABELS[plan.state.profile])
   const currentCopy = copy.text === guestText ? copy.state : 'idle'
 
@@ -33,9 +42,25 @@ export const Directions = forwardRef<HTMLHeadingElement, { plan: ScenarioPlan }>
           <p className="directions__meta">
             {PROFILE_LABELS[plan.state.profile]} · Floor {target.floor}
           </p>
+          <p className="directions__hint">Select a step to see it on the map.</p>
           <ol className="directions__steps" data-testid="directions">
             {steps.map((step, index) => (
-              <li key={index}>{step.text}</li>
+              <li key={index}>
+                <button
+                  type="button"
+                  className={`step${selected === index ? ' is-current' : ''}`}
+                  aria-current={selected === index ? 'step' : undefined}
+                  onClick={() => onSelect(index)}
+                >
+                  <span className="step__number" aria-hidden="true">
+                    {index + 1}
+                  </span>
+                  <span className="step__text">{step.text}</span>
+                  <span className="step__floor" aria-hidden="true">
+                    F{step.floor}
+                  </span>
+                </button>
+              </li>
             ))}
           </ol>
           <button type="button" className="button button--primary" onClick={handleCopy}>
