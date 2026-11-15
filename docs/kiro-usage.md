@@ -14,7 +14,7 @@ This log records each Kiro tool used on Ghost Routes: the concrete task, what ch
 | Kiro IDE (spec + implementation) | **Pending** | Kiro IDE is not yet installed on the dev machine |
 | Agent hook: Post Task Execution → build | **Pending** | Not configured yet |
 | Custom agents `route-reviewer`, `browser-qa` | **Pending** | Not created yet |
-| Playwright MCP in `.kiro/settings/mcp.json` | **Connected, run failed** | Kiro CLI loads the server, but Chrome crashes without `--no-sandbox` (see 2026-11-15 entries). The Playwright *test runner* is used separately |
+| Playwright MCP in `.kiro/settings/mcp.json` | Used: 8/8 checks passed in Kiro CLI 3.3.0 on the local production build (fourth attempt; the first three crashed) | [`docs/evidence/mcp/`](evidence/mcp/), Browser checks below. The Playwright *test runner* is used separately |
 | Kiro CLI edge-case routing checks | **Pending** | CLI so far used only to verify the hook |
 | Kiro Web repository review | **Pending** | Needs a public repository |
 | Kiro Powers (BrowserStack) | **Pending** | Needs BrowserStack access and a public URL |
