@@ -1,0 +1,19 @@
+# Dependencies and build output
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Test output
+test-results/
+playwright-report/
+coverage/
+
+# Local env and OS files
+.env
+.env.*
+.DS_Store
+*.log
+# Saved Kiro evidence is part of the submission
+!docs/evidence/*.log
+
+# Note: .kiro/ is intentionally tracked (specs, hooks, steering, agents).

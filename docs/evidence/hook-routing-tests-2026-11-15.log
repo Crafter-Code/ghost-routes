@@ -1,0 +1,22 @@
+# PostFileSave hook run, Kiro CLI 3.3.0
+# Trigger: agent wrote src/routing/hook-probe.ts via the file write tool (kiro-cli chat --no-interactive).
+# Captured by a temporary probe hook with the same trigger and matcher; probe removed after the run.
+
+Sun Nov 15 15:17:40 CET 2026
+{"session_id":"sess_d9ca63ec-73ea-4739-92e1-a4dbeb8034b3","hook_event_name":"PostFileSave","cwd":"/Users/dmitri/Desktop/Mine/Kiroween - Project/Code","file_path":"/Users/dmitri/Desktop/Mine/Kiroween - Project/Code/src/routing/hook-probe.ts"}
+
+> ghost-routes@0.1.0 test:routing
+> vitest run src/routing
+
+
+ RUN  v5.1.0 /Users/dmitri/Desktop/Mine/Kiroween - Project/Code
+
+ ✓ src/routing/hotel.test.ts (16 tests) 7ms
+ ✓ src/routing/route.property.test.ts (5 tests) 17ms
+
+ Test Files  2 passed (2)
+      Tests  21 passed (21)
+   Start at  15:17:41
+   Duration  88ms (tests 47%, import 32%, transform 14%, worker 7%)
+
+EXIT=0

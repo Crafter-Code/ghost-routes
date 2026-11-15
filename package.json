@@ -1,0 +1,35 @@
+{
+  "name": "ghost-routes",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Step-free event routing for a two-floor hotel: lift outages, ghost trails and verified room relocation.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=26.7.0 <27"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b",
+    "test": "vitest run",
+    "test:routing": "vitest run src/routing",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "fast-check": "^4.10.2",
+    "typescript": "~7.0.2",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0"
+  }
+}

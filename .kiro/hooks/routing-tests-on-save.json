@@ -1,0 +1,13 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Routing tests on save",
+      "description": "Runs the routing unit and property tests when the agent saves a file in src/routing/ (graph, routing, ghost trail, relocation, directions).",
+      "trigger": "PostFileSave",
+      "matcher": "src/routing/.*\\.ts$",
+      "action": { "type": "command", "command": "npm run test:routing" },
+      "timeout": 120
+    }
+  ]
+}
