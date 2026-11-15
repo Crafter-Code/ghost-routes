@@ -135,8 +135,8 @@ Test names start with `H<requirement>.<criterion>`, for example `H4.3 ghost trai
     - _Requirements: 9.6, 9.7_
 
 - [ ] 11. Docs and release
-  - [ ] 11.1 Update the steering files for closure groups and entrance gates, `README.md` for the three scenarios, and `docs/kiro-usage.md` with the client, the build and the results.
-    - Done: `README.md`, `docs/kiro-usage.md`, `routing-code.md` (test files, `ghostDrawn`, door shapes). Open: closure groups and entrance gates in `routing-rules.md`.
+  - [x] 11.1 Update the steering files for closure groups and entrance gates, `README.md` for the three scenarios, and `docs/kiro-usage.md` with the client, the build and the results.
+    - Done: `routing-rules.md` rules 4 and 5 and the drawing note in rule 3; `routing-code.md`; `README.md`; `docs/kiro-usage.md`.
     - _Requirements: 12.4_
   - [ ] 11.2 Open a preview build of the branch (not production) and check it without a login.
     - _Requirements: 12.1, 12.2_
